@@ -8,5 +8,10 @@
   },
   "include": [
     "./src/**/*"
+  ],
+  "exclude": [
+    "./built/",
+    "./node_modules/",
+    "./tests/"
   ]
 }

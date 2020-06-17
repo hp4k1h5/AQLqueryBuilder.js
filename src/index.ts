@@ -1,6 +1,7 @@
 import {buildCollections} from './collections'
 
 export interface query {
+  view: string,
   collections: any,
   terms: any,
   filters: any,
