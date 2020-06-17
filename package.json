@@ -1,0 +1,8 @@
+{
+  "name": "aql-js-andsorsnots",
+  "version": "0.0.0",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^3.9.5"
+  }
+}
