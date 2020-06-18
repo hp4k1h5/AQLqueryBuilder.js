@@ -14,7 +14,7 @@ export interface query {
   /**
   * a list of @filter interfaces
   * */
-  filters?: any,
+  filters?: filter[],
 }
 
 export interface collection {
@@ -59,4 +59,10 @@ export interface term {
   type: string,
   val: string,
   op: string,
+}
+
+export interface filter {
+  field: string,
+  op: string,
+  val: string | number | Date,
 }

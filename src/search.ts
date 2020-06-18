@@ -1,5 +1,4 @@
-const arangojs = require('arangojs')
-const aql = arangojs.aql
+import { aql } from 'arangojs'
 import { query, collection, term } from './lib/structs'
 import { parseQuery } from './parse'
 

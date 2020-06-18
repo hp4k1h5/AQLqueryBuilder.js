@@ -1,10 +1,13 @@
 import { query } from './lib/structs'
 import { buildSearch } from './search'
+import { buildFilters } from './filter'
 
 export function buildAQL(query: query): any {
   validateQuery(query)
 
   const SEARCH = buildSearch(query)
+  const FILTER = buildFilters(query.filters)
+
   return query
 }
 
