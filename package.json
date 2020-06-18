@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "license": "MIT",
   "scripts": {
-    "test": "mocha -r ts-node/register 'tests/*.ts'",
+    "test": "mocha -r ts-node/register",
+    "tests": "mocha -r ts-node/register 'tests/*.ts",
     "doc": "typedoc src/"
   },
   "dependencies": {

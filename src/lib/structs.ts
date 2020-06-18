@@ -10,11 +10,22 @@ export interface query {
   /**
   * either a @terms interface or a string to be parsed by @parseQuery
   * */
-  terms: terms | string,
+  terms: term[] | string,
   /**
   * a list of @filter interfaces
   * */
   filters?: any,
+}
+
+export interface collection {
+  /**
+  * the name of the collection
+  * */
+  name: string,
+  /**
+  * the name of the text analyzer
+  * */
+  analyzer: string,
 }
 
 /**
@@ -24,7 +35,7 @@ export interface query {
  *  ANDS: {anas:[], phrs: []},
  * }
 **/
-export interface terms {
+export interface term {
   /**
    * Mandatory terms and phrases. All results MUST INCLUDE these terms and
    * phrases.

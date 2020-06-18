@@ -1,9 +1,11 @@
 import {query} from './lib/structs'
+import {buildSearch} from './search'
 
-export function buildQuery(query: query): any {
+export function buildAQL(query: query): any {
   validateQuery(query)
 
-  return query.collections
+  const SEARCH = buildSearch(query)
+  return query
 }
 
 function validateQuery(query: query) {
