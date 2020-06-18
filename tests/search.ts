@@ -21,9 +21,13 @@ describe('search.js', () => {
     
      AND  
      
-     
+     MIN_MATCH(
+      ANALYZER(
+        TOKENS(@value5, @value2)
+        NONE IN doc.@value3, @value2), 
+    @value4)
     
-    OPTIONS @value5
+    OPTIONS @value6
       SORT TFIDF(doc) DESC`)
   })
 })

@@ -23,7 +23,7 @@ export function buildSearch(query: query): any {
   if (!!NOTS) {
     NOTS = aql`${ANDS || ORS ? aql.literal(' AND ') : undefined} 
     ${NOTS.phrs ? aql.literal(' NOT ') : undefined} ${NOTS.phrs}
-    ${NOTS.phrs && NOTS.anas ? aql.literal(' AND ') : undefined} ${NOTS.anas}`
+    ${NOTS.phrs && NOTS.tokens ? aql.literal(' AND ') : undefined} ${NOTS.tokens}`
   }
 
   /* if an empty query.terms string or array is passed SEARCH true*/
