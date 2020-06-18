@@ -1,14 +1,20 @@
+import { aql } from 'arangojs'
 import { query } from './lib/structs'
 import { buildSearch } from './search'
 import { buildFilters } from './filter'
 
-export function buildAQL(query: query): any {
+export function buildAQL(query: query, limit: any = { start: 0, end: 20 }): any {
   validateQuery(query)
 
   const SEARCH = buildSearch(query)
-  const FILTER = buildFilters(query.filters)
+  const FILTER = query.filters && buildFilters(query.filters)
 
-  return query
+  return aql`
+    FOR doc IN ${query.view}
+      ${SEARCH}
+      ${FILTER}
+      LIMIT ${limit.start}, ${limit.end}
+    RETURN doc`
 }
 
 function validateQuery(query: query) {
