@@ -1,4 +1,6 @@
-export function parseQuery(queryString: string): any {
+import {term} from './lib/structs'
+
+export function parseQuery(queryString: string): term[] {
   const queryRgx: RegExp = /[+?-]?(["'(]).+?(\1|\))|[^"'()\s]+/g
 
   let matches = queryString.match(queryRgx)

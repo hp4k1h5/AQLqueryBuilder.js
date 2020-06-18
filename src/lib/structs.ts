@@ -6,9 +6,9 @@ export interface query {
   /**
   * the names of the collections indexed by @view to query
   * */
-  collections: string[],
+  collections: collection[],
   /**
-  * either a @terms interface or a string to be parsed by @parseQuery
+  * either an array of @term interfaces or a string to be parsed by @parseQuery
   * */
   terms: term[] | string,
   /**
@@ -35,28 +35,28 @@ export interface collection {
  *  ANDS: {anas:[], phrs: []},
  * }
 **/
-export interface term {
+export interface terms {
   /**
    * Mandatory terms and phrases. All results MUST INCLUDE these terms and
    * phrases.
   **/
-  ANDS?: searches,
+  ANDS?: term[],
   /**
    * Optional terms and phrases. If there are ANDS or NOTS, these serve as
    * match score "boosters". If there are no ANDS or NOTS, ORS become required
    * in results.
   **/
-  ORS?: searches,
+  ORS?: term[],
   /**
    * Search results MUST NOT INCLUDE these terms and phrases. If a result that
    * would otherwise have matched, contains one or more terms or phrases, it
    * will not be included in the result set.
   **/
-  NOTS?: searches,
+  NOTS?: term[],
 }
 
-export interface searches {
-  analyzers: any,
-  phrases: any,
-  /* proximity: any, */
+export interface term {
+  type: string,
+  val: string,
+  op: string,
 }
