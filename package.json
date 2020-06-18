@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "test": "mocha -r ts-node/register",
-    "tests": "mocha -r ts-node/register 'tests/*.ts",
+    "tests": "mocha -r ts-node/register 'tests/*.ts'",
     "doc": "typedoc src/"
   },
   "dependencies": {

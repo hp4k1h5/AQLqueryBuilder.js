@@ -1,5 +1,5 @@
-import {query} from './lib/structs'
-import {buildSearch} from './search'
+import { query } from './lib/structs'
+import { buildSearch } from './search'
 
 export function buildAQL(query: query): any {
   validateQuery(query)

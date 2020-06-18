@@ -22,7 +22,7 @@ export function parseQuery(queryString: string): term[] {
       }
     } else {
       return {
-        type: 'ana',
+        type: 'tok',
         val: match,
         op,
       }

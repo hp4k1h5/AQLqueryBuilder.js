@@ -1,26 +1,50 @@
 const arangojs = require('arangojs')
 const aql = arangojs.aql
-import {query, collection, term} from './lib/structs'
-import {parseQuery} from './parse'
+import { query, collection, term } from './lib/structs'
+import { parseQuery } from './parse'
 
 
 export function buildSearch(query: query): any {
+  /* parse string query */
   query.terms = typeof query.terms == 'string'
     ? parseQuery(query.terms)
     : query.terms
+
+  /* build boolean pieces */
   let ANDS = buildOPS(query.collections, query.terms, '+')
   let ORS = buildOPS(query.collections, query.terms, '?')
-  return [ANDS, ORS]
+  let NOTS = buildOPS(query.collections, query.terms, '-')
+
+  /* handle combinations */
+  if (ANDS && ORS) {
+    ANDS = aql`${ANDS} OR (${ANDS} AND ${ORS})`
+    ORS = undefined
+  }
+  if (!!NOTS) {
+    NOTS = aql`${ANDS || ORS ? aql.literal(' AND ') : undefined} 
+    ${NOTS.phrs ? aql.literal(' NOT ') : undefined} ${NOTS.phrs}
+    ${NOTS.phrs && NOTS.anas ? aql.literal(' AND ') : undefined} ${NOTS.anas}`
+  }
+
+  /* if an empty query.terms string or array is passed SEARCH true*/
+  return aql`
+  SEARCH 
+    ${ANDS} 
+    ${ORS}
+    ${NOTS}
+    ${(!ANDS && !ORS && !NOTS) || undefined}
+    OPTIONS ${{ collections: query.collections }}
+      SORT TFIDF(doc) DESC`
 }
 
 function buildOPS(collections: collection[], terms: term[], op: string): any {
   const opWord: string = op == '+' ? ' AND ' : ' OR '
 
-  let queryTerms: any = terms.filter((t: {op: string}) => t.op === op)
+  let queryTerms: any = terms.filter((t: term) => t.op == op)
   if (!queryTerms.length) return
 
-  /*phrases*/
-  let phrases = queryTerms.filter((qT: {type: string}) => qT.type == 'phr')
+  /* phrases */
+  let phrases = queryTerms.filter((qT: term) => qT.type == 'phr')
     .map((phrase: any) => buildPhrase(phrase, collections))
   if (!phrases.length) {
     phrases = undefined
@@ -28,12 +52,13 @@ function buildOPS(collections: collection[], terms: term[], op: string): any {
     phrases = aql.join(phrases, opWord)
   }
 
-  let tokens = queryTerms.filter((qT: {type: string}) => qT.type === 'tok')
+  /* tokens */
+  let tokens = queryTerms.filter((qT: { type: string }) => qT.type === 'tok')
   tokens = tokens && buildTokens(tokens, collections)
 
   if (!phrases && !tokens) return
-  if (op == '-') return {phrases, tokens}
-  if (phrases && tokens) return aql.join([phrases, tokens], opWord)
+  if (op == '-') return { phrases, tokens }
+  if (phrases && tokens) return aql.join([ phrases, tokens ], opWord)
   return (tokens || phrases)
 }
 
@@ -53,8 +78,8 @@ function buildTokens(tokens: term[], collections: collection[]): any {
   }
 
   const mapped = tokens.reduce((a, v) => {
-    const op = a[opWordMap[v.op]]
-    a[opWordMap[v.op]] = op ? op + ' ' + v.val : v.val
+    const op = a[ opWordMap[ v.op ] ]
+    a[ opWordMap[ v.op ] ] = op ? op + ' ' + v.val : v.val
     return a
   }, {})
 
@@ -68,10 +93,10 @@ function buildTokens(tokens: term[], collections: collection[]): any {
   let remapped = []
   collections.forEach(coll => {
     remapped.push(
-      ...Object.keys(mapped).map(op => makeTokenAnalyzers(mapped[op], op, coll.analyzer, 'text'))
+      ...Object.keys(mapped).map(op => makeTokenAnalyzers(mapped[ op ], op, coll.analyzer, 'text'))
     )
   })
 
   return aql`MIN_MATCH(${aql.join(remapped, ', ')}, 
-    ${tokens[0].op === '-' ? collections.length : 1})`
+    ${tokens[ 0 ].op === '-' ? collections.length : 1})`
 }

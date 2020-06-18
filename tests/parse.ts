@@ -17,7 +17,7 @@ describe('parse.ts', () => {
     expect(parsedQuery).to.be.an('array').that.has.lengthOf(3)
     expect(parsedQuery[0]).to.deep.equal({
       op: "?",
-      type: "ana",
+      type: "tok",
       val: "terms",
     })
     expect(parsedQuery[1]).to.deep.equal({
@@ -41,7 +41,7 @@ describe('parse.ts', () => {
 
     expect(parsedQuery[2]).to.deep.equal({
       op: "-",
-      type: "ana",
+      type: "tok",
       val: 'cannot',
     })
   })

@@ -9,8 +9,8 @@ describe('index.ts', () => {
   })
 
   it('should validate the query', () => {
-    expect(() => buildAQL({view: '', collections: [], terms: {}})).to.throw(/query.view must be a valid ArangoSearch View name/)
+    expect(() => buildAQL({view: '', collections: [], terms: []})).to.throw(/query.view must be a valid ArangoSearch View name/)
 
-    expect(() => buildAQL({view: 'view', collections: [], terms: {}})).to.throw(/query.collections must have at least one name/)
+    expect(() => buildAQL({view: 'view', collections: [], terms: []})).to.throw(/query.collections must have at least one name/)
   })
 })
