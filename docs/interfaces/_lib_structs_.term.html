@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>query | aql-js-andsorsnots</title>
+	<title>term | aql-js-andsorsnots</title>
 	<meta name="description" content="Documentation for aql-js-andsorsnots">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,13 +56,13 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_index_.html">&quot;index&quot;</a>
+					<a href="../modules/_lib_structs_.html">&quot;lib/structs&quot;</a>
 				</li>
 				<li>
-					<a href="_index_.query.html">query</a>
+					<a href="_lib_structs_.term.html">term</a>
 				</li>
 			</ul>
-			<h1>Interface query</h1>
+			<h1>Interface term</h1>
 		</div>
 	</div>
 </header>
@@ -73,7 +73,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">query</span>
+						<span class="target">term</span>
 					</li>
 				</ul>
 			</section>
@@ -84,10 +84,9 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_index_.query.html#collections" class="tsd-kind-icon">collections</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_index_.query.html#filters" class="tsd-kind-icon">filters</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_index_.query.html#terms" class="tsd-kind-icon">terms</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_index_.query.html#view" class="tsd-kind-icon">view</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_lib_structs_.term.html#op" class="tsd-kind-icon">op</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_lib_structs_.term.html#type" class="tsd-kind-icon">type</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_lib_structs_.term.html#val" class="tsd-kind-icon">val</a></li>
 							</ul>
 						</section>
 					</div>
@@ -96,65 +95,34 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="collections" class="tsd-anchor"></a>
-					<h3>collections</h3>
-					<div class="tsd-signature tsd-kind-icon">collections<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<a name="op" class="tsd-anchor"></a>
+					<h3>op</h3>
+					<div class="tsd-signature tsd-kind-icon">op<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/HP4k1h5/aql-js-andsorsnots/blob/9795f19/src/index.ts#L10">index.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/HP4k1h5/aql-js-andsorsnots/blob/5deccfe/src/lib/structs.ts#L61">lib/structs.ts:61</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>the names, an array of strings, of the collections indexed by @view to
-							query</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="filters" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> filters</h3>
-					<div class="tsd-signature tsd-kind-icon">filters<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
+					<a name="type" class="tsd-anchor"></a>
+					<h3>type</h3>
+					<div class="tsd-signature tsd-kind-icon">type<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/HP4k1h5/aql-js-andsorsnots/blob/9795f19/src/index.ts#L18">index.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/HP4k1h5/aql-js-andsorsnots/blob/5deccfe/src/lib/structs.ts#L59">lib/structs.ts:59</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>a list of @filter interfaces</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="terms" class="tsd-anchor"></a>
-					<h3>terms</h3>
-					<div class="tsd-signature tsd-kind-icon">terms<span class="tsd-signature-symbol">:</span> <a href="_index_.terms.html" class="tsd-signature-type">terms</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<a name="val" class="tsd-anchor"></a>
+					<h3>val</h3>
+					<div class="tsd-signature tsd-kind-icon">val<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/HP4k1h5/aql-js-andsorsnots/blob/9795f19/src/index.ts#L14">index.ts:14</a></li>
+							<li>Defined in <a href="https://github.com/HP4k1h5/aql-js-andsorsnots/blob/5deccfe/src/lib/structs.ts#L60">lib/structs.ts:60</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>either a @terms interface or a string to be parsed by @parseQuery</p>
-						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="view" class="tsd-anchor"></a>
-					<h3>view</h3>
-					<div class="tsd-signature tsd-kind-icon">view<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/HP4k1h5/aql-js-andsorsnots/blob/9795f19/src/index.ts#L5">index.ts:5</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>the name of the ArangoSearch view to query</p>
-						</div>
-					</div>
 				</section>
 			</section>
 		</div>
@@ -164,39 +132,48 @@
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="../modules/_index_.html">&quot;index&quot;</a>
+					</li>
+					<li class="current tsd-kind-module">
+						<a href="../modules/_lib_structs_.html">&quot;lib/structs&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_parse_.html">&quot;parse&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_search_.html">&quot;search&quot;</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_lib_structs_.collection.html" class="tsd-kind-icon">collection</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_lib_structs_.query.html" class="tsd-kind-icon">query</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="_index_.query.html" class="tsd-kind-icon">query</a>
+						<a href="_lib_structs_.term.html" class="tsd-kind-icon">term</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_index_.query.html#collections" class="tsd-kind-icon">collections</a>
+								<a href="_lib_structs_.term.html#op" class="tsd-kind-icon">op</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_index_.query.html#filters" class="tsd-kind-icon">filters</a>
+								<a href="_lib_structs_.term.html#type" class="tsd-kind-icon">type</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_index_.query.html#terms" class="tsd-kind-icon">terms</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="_index_.query.html#view" class="tsd-kind-icon">view</a>
+								<a href="_lib_structs_.term.html#val" class="tsd-kind-icon">val</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
-						<a href="_index_.terms.html" class="tsd-kind-icon">terms</a>
-					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module">
-						<a href="../modules/_index_.html#buildquery" class="tsd-kind-icon">build<wbr>Query</a>
+						<a href="_lib_structs_.terms.html" class="tsd-kind-icon">terms</a>
 					</li>
 				</ul>
 			</nav>
@@ -208,11 +185,12 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 			</ul>
 		</div>
 	</div>
