@@ -1,5 +1,5 @@
 export function parseQuery(queryString: string): any {
-  const queryRgx: RegExp = /(["'(]).+?(\1|\))|[^"'()\s]+/g
+  const queryRgx: RegExp = /[+?-]?(["'(]).+?(\1|\))|[^"'()\s]+/g
 
   let matches = queryString.match(queryRgx)
   if (!matches) return []
@@ -7,7 +7,7 @@ export function parseQuery(queryString: string): any {
   return matches.map(match => {
     /* strip op */
     let op = '?'
-    if (/\+\?-/.test(match[0])) {
+    if (/[+?-]/.test(match[0])) {
       op = match[0]
       match = match.substring(1)
     }
