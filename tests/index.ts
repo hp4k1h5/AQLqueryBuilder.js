@@ -23,17 +23,17 @@ describe('buildAQL', () => {
     expect(builtAQL).to.be.an('object')
 
     expect(builtAQL.query).to.equal(`
-    FOR doc IN @value0
+    FOR doc IN view
       
   SEARCH 
      
     
     
-    @value1
-    OPTIONS @value2
+    @value0
+    OPTIONS @value1
       SORT TFIDF(doc) DESC
       
-      LIMIT @value3, @value4
+      LIMIT @value2, @value3
     RETURN doc`
     )
   })

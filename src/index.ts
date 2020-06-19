@@ -9,8 +9,9 @@ export function buildAQL(query: query, limit: any = { start: 0, end: 20 }): any 
   const SEARCH = buildSearch(query)
   const FILTER = query.filters && buildFilters(query.filters)
 
+  /* FOR doc IN ${query.view} */
   return aql`
-    FOR doc IN ${query.view}
+    FOR doc IN ${aql.literal(query.view)}
       ${SEARCH}
       ${FILTER}
       LIMIT ${limit.start}, ${limit.end}

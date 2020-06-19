@@ -1,5 +1,5 @@
-import {expect} from 'chai'
-import {parseQuery} from '../src/parse'
+import { expect } from 'chai'
+import { parseQuery } from '../src/parse'
 
 describe('parse.ts', () => {
   it('should export a function parseQuery', () => {
@@ -15,12 +15,12 @@ describe('parse.ts', () => {
      when a string is passed with no op hints`, () => {
     const parsedQuery = parseQuery('terms "a and b" c')
     expect(parsedQuery).to.be.an('array').that.has.lengthOf(3)
-    expect(parsedQuery[0]).to.deep.equal({
+    expect(parsedQuery[ 0 ]).to.deep.equal({
       op: "?",
       type: "tok",
       val: "terms",
     })
-    expect(parsedQuery[1]).to.deep.equal({
+    expect(parsedQuery[ 1 ]).to.deep.equal({
       op: "?",
       type: "phr",
       val: '"a and b"',
@@ -33,13 +33,13 @@ describe('parse.ts', () => {
 
     expect(parsedQuery).to.be.an('array').that.has.lengthOf(4)
 
-    expect(parsedQuery[1]).to.deep.equal({
+    expect(parsedQuery[ 1 ]).to.deep.equal({
       op: "+",
       type: "phr",
       val: '"must have"',
     })
 
-    expect(parsedQuery[2]).to.deep.equal({
+    expect(parsedQuery[ 2 ]).to.deep.equal({
       op: "-",
       type: "tok",
       val: 'cannot',

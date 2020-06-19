@@ -25,14 +25,15 @@ export function buildSearch(query: query): any {
     ${NOTS.phrs && NOTS.tokens ? aql.literal(' AND ') : undefined} ${NOTS.tokens}`
   }
 
-  /* if an empty query.terms string or array is passed SEARCH true*/
+  /* if an empty query.terms string or array is passed, SEARCH true, bringing
+   * back all documents in view */
   return aql`
   SEARCH 
     ${ANDS} 
     ${ORS}
     ${NOTS}
     ${(!ANDS && !ORS && !NOTS) || undefined}
-    OPTIONS ${{ collections: query.collections }}
+    OPTIONS ${{ collections: query.collections.map(c => c.name) }}
       SORT TFIDF(doc) DESC`
 }
 
@@ -63,7 +64,7 @@ function buildOPS(collections: collection[], terms: term[], op: string): any {
 
 function buildPhrase(phrase: term, collections: collection[]): any {
   return collections.map(coll => {
-    return aql`PHRASE(doc.text, ${phrase.val.slice(1, -1)}, ${coll.analyzer}`
+    return aql`PHRASE(doc.text, ${phrase.val.slice(1, -1)}, ${coll.analyzer})`
   })
 }
 
