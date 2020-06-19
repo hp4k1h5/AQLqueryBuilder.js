@@ -12,6 +12,11 @@ export interface query {
   * */
   terms: term[] | string,
   /**
+  * the name of the document key to search, must be the same across all
+  * documents 
+  * */
+  key?: string,
+  /**
   * a list of @filter interfaces
   * */
   filters?: filter[],
@@ -26,33 +31,6 @@ export interface collection {
   * the name of the text analyzer
   * */
   analyzer: string,
-}
-
-/**
- * @terms are the basic boolean search logic terms applied to ArangoSearch
- * Views via the Arango Query Language (AQL). 
- * Example: {
- *  ANDS: {anas:[], phrs: []},
- * }
-**/
-export interface terms {
-  /**
-   * Mandatory terms and phrases. All results MUST INCLUDE these terms and
-   * phrases.
-  **/
-  ANDS?: term[],
-  /**
-   * Optional terms and phrases. If there are ANDS or NOTS, these serve as
-   * match score "boosters". If there are no ANDS or NOTS, ORS become required
-   * in results.
-  **/
-  ORS?: term[],
-  /**
-   * Search results MUST NOT INCLUDE these terms and phrases. If a result that
-   * would otherwise have matched, contains one or more terms or phrases, it
-   * will not be included in the result set.
-  **/
-  NOTS?: term[],
 }
 
 export interface term {
