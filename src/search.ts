@@ -65,7 +65,7 @@ function buildOPS(collections: collection[], terms: term[], op: string, key:
 
 function buildPhrase(phrase: term, collections: collection[], key: string): any {
   return collections.map(coll => {
-    return aql`PHRASE(doc${key}, ${phrase.val.slice(1, -1)}, ${coll.analyzer})`
+    return aql`PHRASE(doc.${key}, ${phrase.val.slice(1, -1)}, ${coll.analyzer})`
   })
 }
 

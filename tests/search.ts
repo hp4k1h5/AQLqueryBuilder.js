@@ -6,14 +6,23 @@ describe('search.js', () => {
     expect(buildSearch).to.be.a('function')
   })
 
-  it('should return SEARCH true when terms: is an empty string', () => {
-    const query = { view: 'search_view', collections: [ { name: 'coll', analyzer: 'text_en' } ], terms: '' }
-    const builtSearch = buildSearch(query)
+  it(`should return SEARCH true 
+      when terms: is an empty string or array`, () => {
+
+    /* empty string */
+    let empty_string_query = { view: 'search_view', collections: [ { name: 'coll', analyzer: 'text_en' } ], terms: '' }
+    const builtSearch = buildSearch(empty_string_query)
 
     expect(builtSearch).to.be.an('object')
     expect(Object.keys(builtSearch.bindVars)).to.have.length(2)
     expect(builtSearch.bindVars.value0).to.equal(true)
     expect(builtSearch.bindVars.value1).to.deep.equal({ collections: [ 'coll' ] })
+
+    /* empty array */
+    let empty_array_query = { view: 'search_view', collections: [ { name: 'coll', analyzer: 'text_en' } ], terms: [] }
+    const builtSearch_from_array = buildSearch(empty_array_query)
+
+    expect(builtSearch_from_array.bindVars.value0).to.equal(true)
   })
 
   it('should return an array of aql objects', () => {
@@ -21,7 +30,7 @@ describe('search.js', () => {
     const builtSearch = buildSearch(query)
 
     expect(Object.keys(builtSearch.bindVars)).to.have.length(7)
-    expect(builtSearch.bindVars.value0[ 0 ].query).to.equal('PHRASE(doc.text, @value0, @value1)')
+    expect(builtSearch.bindVars.value0[ 0 ].query).to.equal('PHRASE(doc.@value0, @value1, @value2)')
     expect(builtSearch.bindVars.value1).to.deep.equal('token')
     expect(builtSearch.bindVars.value2).to.deep.equal('text_en')
     expect(builtSearch.bindVars.value3).to.deep.equal('text')
@@ -48,9 +57,9 @@ describe('search.js', () => {
       SORT TFIDF(doc) DESC`)
   })
 
-  it('should return an array of aql objects', () => {
+  it.skip('should return an array of aql objects', () => {
     const query = { view: 'search_view', collections: [ { name: 'coll', analyzer: 'text_en' } ], terms: '+mandatory -exclude ?"optional phrase"' }
     const builtSearch = buildSearch(query)
     expect(builtSearch.query).to.equal(``)
-  }).skip()
+  })
 })
