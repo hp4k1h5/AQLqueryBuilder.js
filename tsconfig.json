@@ -2,7 +2,8 @@
   "compilerOptions": {
     "outDir": "./built",
     "allowJs": true,
-    "target": "es2015",
+    "target": "ES2015",
+    "module": "CommonJS",
     "declaration": true,
     "emitDeclarationOnly": true
   },

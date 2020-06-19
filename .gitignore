@@ -1,2 +1,5 @@
 built/
 node_modules/
+yarn.lock
+docs/
+**/*.wiki
