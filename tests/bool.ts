@@ -96,4 +96,20 @@ describe("boolean search logic", () => {
             expect(result).to.deep.equal({ a: 1 })
         })
     })
+    describe('ORS', () => {
+        it(`should exclude all results that do not match required terms`, async () => {
+            const query = {
+                view: view.name,
+                collections: [{
+                    name: collectionName,
+                    analyzer: 'text_en'
+                }],
+                terms: '+mandatory -exclude ?"optional phrase"'
+            }
+            const aqlQuery = buildAQL(query)
+            expect(aqlQuery.query).to.equal('')
+
+        })
+    })
+
 })

@@ -17,6 +17,7 @@ export function buildAQL(query: query, limit: any = { start: 0, end: 20 }): any 
       LIMIT ${limit.start}, ${limit.end}
     RETURN doc`
 }
+exports.buildAQL = buildAQL
 
 function validateQuery(query: query) {
   if (!query.view.length) throw Error('query.view must be a valid ArangoSearch View name')

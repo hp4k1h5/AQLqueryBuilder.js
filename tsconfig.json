@@ -2,16 +2,12 @@
   "compilerOptions": {
     "outDir": "./built",
     "allowJs": true,
-    "target": "es5",
+    "target": "ES2015",
+    "module": "CommonJS",
     "declaration": true,
     "emitDeclarationOnly": true
   },
   "include": [
     "./src/**/*"
-  ],
-  "exclude": [
-    "./built/",
-    "./node_modules/",
-    "./tests/"
   ]
 }
