@@ -25,7 +25,24 @@ describe('search.js', () => {
     expect(builtSearch_from_array.bindVars.value0).to.equal(true)
   })
 
-  it('should return an array of aql objects', () => {
+  it(`should handle single phrase queries`, () => {
+    const query = { view: 'search_view', collections: [ { name: 'coll', analyzer: 'text_en' } ], terms: '"complex phrase"' }
+    const builtSearch = buildSearch(query)
+
+    expect(builtSearch.query).to.equal(`
+  SEARCH 
+     
+    @value0
+    
+    
+    OPTIONS @value1
+      SORT TFIDF(doc) DESC`)
+
+    expect(builtSearch.bindVars.value0[ 0 ].query).to.deep.equal('PHRASE(doc.@value0, @value1, @value2)')
+  })
+
+  it(`should return an array of aql objects
+     when a complex query is passed`, () => {
     const query = { view: 'search_view', collections: [ { name: 'coll', analyzer: 'text_en' } ], terms: '-a +"query string" ?token' }
     const builtSearch = buildSearch(query)
 
@@ -57,9 +74,31 @@ describe('search.js', () => {
       SORT TFIDF(doc) DESC`)
   })
 
+  /* TODO basically passes but there's spacing issues around AND */
   it.skip('should return an array of aql objects', () => {
     const query = { view: 'search_view', collections: [ { name: 'coll', analyzer: 'text_en' } ], terms: '+mandatory -exclude ?"optional phrase"' }
     const builtSearch = buildSearch(query)
-    expect(builtSearch.query).to.equal(``)
+    expect(builtSearch.query).to.equal(`
+  SEARCH 
+    MIN_MATCH(
+      ANALYZER(
+        TOKENS(@value0, @value1)
+        ALL IN doc.@value2, @value1), 
+    @value3) OR (MIN_MATCH(
+      ANALYZER(
+        TOKENS(@value0, @value1)
+        ALL IN doc.@value2, @value1), 
+    @value3) AND @value4) 
+
+     AND 
+
+     MIN_MATCH(
+      ANALYZER(
+        TOKENS(@value5, @value1)
+        NONE IN doc.@value2, @value1), 
+    @value3)
+  
+    OPTIONS @value6
+      SORT TFIDF(doc) DESC`)
   })
 })
