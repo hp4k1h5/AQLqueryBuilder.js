@@ -49,14 +49,8 @@ function buildOPS(
   if (!queryTerms.length) return
 
   /* phrases */
-  let phrases = queryTerms
-    .filter((qT: term) => qT.type == 'phr')
-    .map((phrase: any) => buildPhrase(phrase, collections, key))
-  if (!phrases.length) {
-    phrases = undefined
-  } else {
-    phrases = aql.join(phrases, opWord)
-  }
+  let phrases = queryTerms.filter((qT: term) => qT.type == 'phr')
+  phrases = buildPhrases(phrases, collections, key, opWord)
 
   /* tokens */
   let tokens = queryTerms.filter((qT: { type: string }) => qT.type === 'tok')
@@ -66,6 +60,20 @@ function buildOPS(
   if (op == '-') return { phrases, tokens }
   if (phrases && tokens) return aql.join([ phrases, tokens ], opWord)
   return tokens || phrases
+}
+
+function buildPhrases(
+  phrases: term[],
+  collections: collection[],
+  key: string,
+  opWord: string,
+): any {
+  if (!phrases.length) return undefined
+
+  return aql.join(
+    phrases.map((phrase: any) => buildPhrase(phrase, collections, key)),
+    opWord,
+  )
 }
 
 function buildPhrase(
