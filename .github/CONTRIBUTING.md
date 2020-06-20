@@ -27,11 +27,19 @@ When contributing code, please:
 and should be the only version branch available. Don't hesitate to ask if it
 is unclear.
 4) make changes
-5) add tests; currently using mochai/chai
+5) add tests; using mochai/chai
   run tests with e.g. `yarn test tests/glob`  
   or  
   `yarn tests` to run the suite
-6) add comments to your functions, and if possible, in the
+  see [testing](#testing) for more information.
+6) add comments, and if possible, in the
 [typedoc](https://github.com/TypeStrong/typedoc) style
 7) submit a merge request from your forked branch into the
 latest HP4k1h5/AQLqueryBuilder `v.X.X.X` branch.
+
+
+### testing
+
+all tests that require a live arango instance are run with root:"" no
+permissions on `localhost:8529`. This can be modified in test files that
+require db access.

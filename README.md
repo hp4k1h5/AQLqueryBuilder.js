@@ -55,6 +55,9 @@ presence of the phrase "optional phrase". If no mandatory or exclude terms are
 provided, optional terms are considered required, so as not to retrieve all
 documents.
 
+See [default query syntax](#default-query-syntax) and this schematic
+[example](#example) for more details.
+
 If multiple collections are passed, the above queried is essentially
 replicated across all collections, see examples in 'tests/cols.ts'. In the
 future this will also accommodate multiple key searches.
@@ -117,7 +120,7 @@ const queryObject = {
 }
 const aqlQuery = buildAQL(queryObject)
 // ... const cursor = await db.query(aqlQuery)
-// ... const cursor = await db.query(aqlQuery, {start:20, end:40})
+// ... const cursor = await db.query(buildAQL(queryObject, {start:20, end:40})
 ```
 `collections` is an array of `collection` objects. This allows searching and
 filtering across collections impacted by the search.
@@ -209,7 +212,7 @@ by one of the following symbols `+ ? -`, or the plus-sign, the question-mark,
 and the minus-sign. If a word has no operator prefix, it is considered
 optional and is counted as an `OR`.
 
-Example:
+#### Example
 input `one +two -"buckle my shoe"` and the queryParser will interpret as
 follows:
 
