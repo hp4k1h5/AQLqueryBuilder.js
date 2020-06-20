@@ -12,42 +12,52 @@ all available Arango Search View capabilities, including, `PHRASE` and
 multi-lingual and language-specific, complex phrase, (proximity... TBD) and tokenized
 search terms.
 
-For example, passing a search phrase like: `+mandatory -exclude ?"optional
-phrase"` to `buildAQL`'s query object as the `term` key, will produce a query
-like the following:
+For example, passing a search phrase like: `some +words -not +"phrase search"
+-"not these" ?"could have"` to `buildAQL`'s query object as the `term` key,
+will produce a query like the following:
 
-```aql
-FOR doc IN search_view
-  SEARCH
-    MIN_MATCH(
-      ANALYZER(
-        TOKENS(@value0, @value1)
-        ALL IN doc.@value2, @value1),
-    @value3) OR (MIN_MATCH(
-      ANALYZER(
-        TOKENS(@value0, @value1)
-        ALL IN doc.@value2, @value1),
-    @value3) AND (PHRASE(doc.@value2, @value4, @value1)))
+```asx
+  FOR doc IN view
 
-     AND  
+SEARCH
+  (PHRASE(doc.text, "phrase search", analyzer)) AND MIN_MATCH(
+    ANALYZER(
+      TOKENS("words", analyzer)
+      ALL IN doc.text, analyzer),
+  1) OR ((PHRASE(doc.text, "phrase search", analyzer)) AND MIN_MATCH(
+    ANALYZER(
+      TOKENS("words", analyzer)
+      ALL IN doc.text, analyzer),
+  1) AND (PHRASE(doc.text, "could have", analyzer)) OR MIN_MATCH(
+    ANALYZER(
+      TOKENS(other, analyzer)
+      ANY IN doc.text, analyzer),
+  1))
+  
+   AND  
+   NOT  (PHRASE(doc.text, "not these", analyzer))
+   AND  MIN_MATCH(
+    ANALYZER(
+      TOKENS("nor", analyzer)
+      NONE IN doc.text, analyzer),
+  1)
+  
+  OPTIONS {"collections": ["col"]}
+    SORT TFIDF(doc) DESC
 
-     MIN_MATCH(
-      ANALYZER(
-        TOKENS(@value5, @value1)
-        NONE IN doc.@value2, @value1),
-    @value3)
-
-    OPTIONS @value6
-      SORT TFIDF(doc) DESC
-
-      LIMIT @value7, @value8
-  RETURN doc
+    LIMIT "phrase search"0, "phrase search"1
+  RETURN doc`
 ```
+
 This query will retrieve all documents that __include__ the term "mandatory"
 AND __do not include__ the term "exclude", AND whose ranking will be boosted by the
 presence of the phrase "optional phrase". If no mandatory or exclude terms are
 provided, optional terms are considered required, so as not to retrieve all
 documents.
+
+If multiple collections are passed, the above queried is essentially
+replicated across all collections, see examples in 'tests/cols.ts'. In the
+future this will also accommodate multiple key searches.
 
 ## setup
 
@@ -159,24 +169,33 @@ Example:
 ```
 
 ### boolean search logic
+
 Quoting [mit's Database Search Tips](https://libguides.mit.edu/c.php?g=175963&p=1158594):
+
 > Boolean operators form the basis of mathematical sets and database logic.
     They connect your search words together to either narrow or broaden your
     set of results.  The three basic boolean operators are: AND, OR, and NOT.
 
 #### `+` AND
+
 * Mandatory terms and phrases. All results MUST INCLUDE these terms and
   phrases.
+
 #### `?` OR
+
 * Optional terms and phrases. If there are ANDS or NOTS, these serve as match
   score "boosters". If there are no ANDS or NOTS, ORS become required in
   results.
+
 #### `-` NOT
+
 * Search results MUST NOT INCLUDE these terms and phrases. If a result that
   would otherwise have matched, contains one or more terms or phrases, it will
-  not be included in the result set.
+  not be included in the result set. If there are no required or optional
+  terms, all results that do NOT match these terms will be returned.
 
 ### default query syntax
+
 for more information on boolean search logic see
   [above](#boolean-search-logic)
 
@@ -208,3 +227,4 @@ score higher than those that do not.
 plase see [bugs](https://github.com/HP4k1h5/AQLqueryBuilder.js/issues/new?assignees=HP4k1h5&labels=bug&template=bug_report.md&title=basic)
 ## contributing
 plase see [./.github/CONTRIBUTING.md]
+
