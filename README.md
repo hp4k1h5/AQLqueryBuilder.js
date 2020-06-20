@@ -48,7 +48,7 @@ SEARCH
     LIMIT "phrase search"0, "phrase search"1
   RETURN doc`
 ```
-n.b. the above code block is sytled with c but is .aql compatible.
+n.b. the above code block is styled with c but is .aql compatible.
 
 This query will retrieve all documents that __include__ the term "mandatory"
 AND __do not include__ the term "exclude", AND whose ranking will be boosted by the
@@ -233,7 +233,7 @@ following documents:
 ```boxcar
 ┏━━━━━━━━━━━━━━━━━━┓  ┏━━━━━━━━━━━━━━━━━━┓  ┏━━━━━━━━━━━━━━━━━━┓
 ┃ Document A       ┃  ┃  Document B      ┃  ┃ Document C       ┃
-┃ ----------       ┃  ┃                  ┃  ┃                  ┃
+┃ ----------       ┃  ┃  ----------      ┃  ┃ ----------       ┃
 ┃                  ┃  ┃ three four       ┃  ┃ one              ┃
 ┃  one    two      ┃  ┃                  ┃  ┃                  ┃
 ┃                  ┃  ┃ and two          ┃  ┃                  ┃
