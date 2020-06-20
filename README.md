@@ -13,10 +13,11 @@ multi-lingual and language-specific, complex phrase, (proximity... TBD) and toke
 search terms.
 
 For example, passing a search phrase like: `+mandatory -exclude ?"optional
-phrase"` to `buildAQL`'s query object as the `term` key, will produce the
-following query:
+phrase"` to `buildAQL`'s query object as the `term` key, will produce a query
+like the following:
 
 ```aql
+FOR doc IN search_view
   SEARCH
     MIN_MATCH(
       ANALYZER(
@@ -38,6 +39,9 @@ following query:
 
     OPTIONS @value6
       SORT TFIDF(doc) DESC
+
+      LIMIT @value7, @value8
+  RETURN doc
 ```
 This query will retrieve all documents that __include__ the term "mandatory"
 AND __do not include__ the term "exclude", AND whose ranking will be boosted by the
