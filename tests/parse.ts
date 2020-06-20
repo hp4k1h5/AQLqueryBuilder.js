@@ -29,20 +29,32 @@ describe('parse.ts', () => {
 
   it(`should return an array of parsed term objects 
      when a complex string is passed`, () => {
-    const parsedQuery = parseQuery('terms +"must have" -cannot -have')
+    const parsedQuery = parseQuery('terms +"must have" -cannot -"have this"')
 
     expect(parsedQuery).to.be.an('array').that.has.lengthOf(4)
 
+    expect(parsedQuery[ 0 ]).to.deep.equal({
+      op: '?',
+      type: 'tok',
+      val: 'terms',
+    })
+
     expect(parsedQuery[ 1 ]).to.deep.equal({
-      op: "+",
-      type: "phr",
+      op: '+',
+      type: 'phr',
       val: '"must have"',
     })
 
     expect(parsedQuery[ 2 ]).to.deep.equal({
-      op: "-",
-      type: "tok",
+      op: '-',
+      type: 'tok',
       val: 'cannot',
+    })
+
+    expect(parsedQuery[ 3 ]).to.deep.equal({
+      op: '-',
+      type: 'phr',
+      val: '"have this"',
     })
   })
 })
