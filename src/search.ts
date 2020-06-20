@@ -21,8 +21,8 @@ export function buildSearch(query: query): any {
   }
   if (!!NOTS) {
     NOTS = aql`${ANDS || ORS ? aql.literal(' AND ') : undefined} 
-    ${NOTS.phrs ? aql.literal(' NOT ') : undefined} ${NOTS.phrs}
-    ${NOTS.phrs && NOTS.tokens ? aql.literal(' AND ') : undefined} ${NOTS.tokens}`
+    ${NOTS.phrases ? aql.literal(' NOT ') : undefined} ${NOTS.phrases}
+    ${NOTS.phrases && NOTS.tokens ? aql.literal(' AND ') : undefined} ${NOTS.tokens}`
   }
 
   /* if an empty query.terms string or array is passed, SEARCH true, bringing
@@ -68,7 +68,6 @@ function buildPhrase(phrase: term, collections: collection[], key: string): any 
     return aql`PHRASE(doc.${key}, ${phrase.val.slice(1, -1)}, ${coll.analyzer})`
   })
   return aql`(${aql.join(phrases, ' OR ')})`
-
 }
 
 function buildTokens(tokens: term[], collections: collection[], key: string): any {
