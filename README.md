@@ -223,6 +223,24 @@ The generated AQL query, when run, will bring back only results that contain
 contain "one". In this case, documents that contain "one" will be likely to
 score higher than those that do not.
 
+When the above phrase `one +two -"buckle my shoe"` is run against the
+following documents:
+
+```boxcar
+┏━━━━━━━━━━━━━━━━━━┓  ┏━━━━━━━━━━━━━━━━━━┓  ┏━━━━━━━━━━━━━━━━━━┓
+┃ Document A       ┃  ┃  Document B      ┃  ┃ Document C       ┃
+┃ ----------       ┃  ┃                  ┃  ┃                  ┃
+┃                  ┃  ┃ three four       ┃  ┃ one              ┃
+┃  one    two      ┃  ┃                  ┃  ┃                  ┃
+┃                  ┃  ┃ and two          ┃  ┃                  ┃
+┃    buckle my shoe┃  ┃                  ┃  ┃                  ┃
+┗━━━━━━━━━━━━━━━━━━┛  ┗━━━━━━━━━━━━━━━━━━┛  ┗━━━━━━━━━━━━━━━━━━┛
+```
+
+only Document B is returned;  
+Document A is excluded by the phrase "buckle my shoe"  
+Document C does not contain the mandatory word "two"
+
 ## bugs
 plase see [bugs](https://github.com/HP4k1h5/AQLqueryBuilder.js/issues/new?assignees=HP4k1h5&labels=bug&template=bug_report.md&title=basic)
 ## contributing
