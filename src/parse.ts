@@ -1,4 +1,4 @@
-import {term} from './lib/structs'
+import { term } from './lib/structs'
 
 export function parseQuery(queryString: string): term[] {
   const queryRgx: RegExp = /[+?-]?(["'(]).+?(\1|\))|[^"'()\s]+/g
@@ -9,12 +9,12 @@ export function parseQuery(queryString: string): term[] {
   return matches.map(match => {
     /* strip op */
     let op = '?'
-    if (/[+?-]/.test(match[0])) {
-      op = match[0]
+    if (/[+?-]/.test(match[ 0 ])) {
+      op = match[ 0 ]
       match = match.substring(1)
     }
 
-    if (match[0] == '"' || match[0] == "'") {
+    if (match[ 0 ] == '"' || match[ 0 ] == "'") {
       return {
         type: 'phr',
         val: match,
