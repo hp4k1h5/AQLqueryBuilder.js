@@ -32,13 +32,11 @@ describe('search.js', () => {
     expect(builtSearch.query).to.equal(`
   SEARCH 
      
-    @value0
+    (PHRASE(doc.@value0, @value1, @value2))
     
     
-    OPTIONS @value1
+    OPTIONS @value3
       SORT TFIDF(doc) DESC`)
-
-    expect(builtSearch.bindVars.value0[ 0 ].query).to.deep.equal('PHRASE(doc.@value0, @value1, @value2)')
   })
 
   it(`should return an array of aql objects
@@ -47,19 +45,18 @@ describe('search.js', () => {
     const builtSearch = buildSearch(query)
 
     expect(Object.keys(builtSearch.bindVars)).to.have.length(7)
-    expect(builtSearch.bindVars.value0[ 0 ].query).to.equal('PHRASE(doc.@value0, @value1, @value2)')
-    expect(builtSearch.bindVars.value1).to.deep.equal('token')
+    expect(builtSearch.bindVars.value0).to.deep.equal('text')
+    expect(builtSearch.bindVars.value1).to.deep.equal('query string')
     expect(builtSearch.bindVars.value2).to.deep.equal('text_en')
-    expect(builtSearch.bindVars.value3).to.deep.equal('text')
     expect(builtSearch.bindVars.value4).to.deep.equal(1)
     expect(builtSearch.bindVars.value5).to.deep.equal('a')
     expect(builtSearch.bindVars.value6).to.deep.equal({ collections: [ query.collections[ 0 ].name ] })
     expect(builtSearch.query).to.equal(`
   SEARCH 
-    @value0 OR (@value0 AND MIN_MATCH(
+    (PHRASE(doc.@value0, @value1, @value2)) OR ((PHRASE(doc.@value0, @value1, @value2)) AND MIN_MATCH(
       ANALYZER(
-        TOKENS(@value1, @value2)
-        ANY IN doc.@value3, @value2), 
+        TOKENS(@value3, @value2)
+        ANY IN doc.@value0, @value2), 
     @value4)) 
     
      AND  
@@ -67,15 +64,14 @@ describe('search.js', () => {
      MIN_MATCH(
       ANALYZER(
         TOKENS(@value5, @value2)
-        NONE IN doc.@value3, @value2), 
+        NONE IN doc.@value0, @value2), 
     @value4)
     
     OPTIONS @value6
       SORT TFIDF(doc) DESC`)
   })
 
-  /* TODO basically passes but there's spacing issues around AND */
-  it.skip('should return an array of aql objects', () => {
+  it('should return an array of aql objects', () => {
     const query = { view: 'search_view', collections: [ { name: 'coll', analyzer: 'text_en' } ], terms: '+mandatory -exclude ?"optional phrase"' }
     const builtSearch = buildSearch(query)
     expect(builtSearch.query).to.equal(`
@@ -88,16 +84,16 @@ describe('search.js', () => {
       ANALYZER(
         TOKENS(@value0, @value1)
         ALL IN doc.@value2, @value1), 
-    @value3) AND @value4) 
-
-     AND 
-
+    @value3) AND (PHRASE(doc.@value2, @value4, @value1))) 
+    
+     AND  
+     
      MIN_MATCH(
       ANALYZER(
         TOKENS(@value5, @value1)
         NONE IN doc.@value2, @value1), 
     @value3)
-  
+    
     OPTIONS @value6
       SORT TFIDF(doc) DESC`)
   })

@@ -17,8 +17,6 @@ phrase"` to `buildAQL`'s query object as the `term` key, will produce the
 following query:
 
 ```aql
-FOR doc IN search_view
-
   SEARCH
     MIN_MATCH(
       ANALYZER(
@@ -28,9 +26,9 @@ FOR doc IN search_view
       ANALYZER(
         TOKENS(@value0, @value1)
         ALL IN doc.@value2, @value1),
-    @value3) AND @value4) <--------------- @value4 here is the PHRASE search
+    @value3) AND (PHRASE(doc.@value2, @value4, @value1)))
 
-     AND
+     AND  
 
      MIN_MATCH(
       ANALYZER(
@@ -40,9 +38,6 @@ FOR doc IN search_view
 
     OPTIONS @value6
       SORT TFIDF(doc) DESC
-
-      LIMIT @value7, @value8
-  RETURN doc
 ```
 This query will retrieve all documents that __include__ the term "mandatory"
 AND __do not include__ the term "exclude", AND whose ranking will be boosted by the

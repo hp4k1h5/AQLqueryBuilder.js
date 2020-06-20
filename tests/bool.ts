@@ -42,10 +42,10 @@ describe("boolean search logic", () => {
 
     /* add documents */
     const docA = { title: 'doc A', text: 'words in text in document' }
-    const docB = { title: 'doc B', text: 'sample word string to search across' }
     let insert: any = await db.query(aql`INSERT ${docA} INTO ${collection} RETURN NEW`)
     expect(insert._result[ 0 ].title).to.equal('doc A')
 
+    const docB = { title: 'doc B', text: 'sample word string to search across' }
     insert = await db.query(aql`INSERT ${docB} INTO ${collection} RETURN NEW`)
     expect(insert._result[ 0 ].title).to.equal('doc B')
 
@@ -104,7 +104,6 @@ describe("boolean search logic", () => {
       const info = await view.get()
       expect(info.name).to.be.a('string')
 
-
       /* phrase */
       let query = {
         view: info.name,
@@ -112,21 +111,26 @@ describe("boolean search logic", () => {
           name: collectionName,
           analyzer: 'text_en'
         } ],
+        /* should match both results */
         terms: '+"word"'
       }
       let aqlQuery = buildAQL(query)
+      expect(Object.keys(aqlQuery.bindVars)).to.have.length(6)
 
-      expect(Object.keys(aqlQuery.bindVars)).to.have.length(4)
-
+      /* should match 2 documents */
       let cursor = await db.query(aqlQuery)
       expect(cursor.hasNext()).to.be.ok
-      /* should have two results*/
       let result = await cursor.next()
       expect(cursor.hasNext()).to.be.ok
       await cursor.next()
       expect(cursor.hasNext()).to.not.be.ok
 
-      /* should only have one document */
+      /* should match 0 documents */
+      query.terms = '+"wyuxaouw"'
+      cursor = await db.query(buildAQL(query))
+      expect(cursor.hasNext()).to.not.be.ok
+
+      /* should match 1 document */
       query.terms = '+"in document"'
       cursor = await db.query(buildAQL(query))
       expect(cursor.hasNext()).to.be.ok
@@ -139,13 +143,13 @@ describe("boolean search logic", () => {
       expect(cursor.hasNext()).to.be.ok
       result = await cursor.all()
       expect(result).to.have.length(1)
-      expect(result[ 0 ].title).to.equal('doc A')
+      expect(result[ 0 ].title).to.equal('doc B')
       expect(cursor.hasNext()).to.not.be.ok
 
 
       query.terms = '+"nowhere found"'
       cursor = await db.query(buildAQL(query))
-      expect(cursor.hasNext()).to.be.ok
+      expect(cursor.hasNext()).to.not.be.ok
 
       /* tokens */
       query = {
@@ -184,7 +188,7 @@ describe("boolean search logic", () => {
           name: collectionName,
           analyzer: 'text_en'
         } ],
-        terms: '+mandatory -exclude ?"optional phrase"'
+        terms: '?word'
       }
       const aqlQuery = buildAQL(query)
       const cursor = await db.query(aqlQuery)
@@ -192,8 +196,8 @@ describe("boolean search logic", () => {
       let has = cursor.hasNext()
       expect(has).to.be.ok
 
-      let result = await cursor.next()
-      expect(result).to.deep.equal({ a: 1 })
+      let result = await cursor.all()
+      expect(result).to.have.length(2)
     })
   })
 })
