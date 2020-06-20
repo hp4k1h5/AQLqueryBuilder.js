@@ -75,7 +75,8 @@ describe("boolean search logic", () => {
   })
 
   describe('empty terms', () => {
-    it(`should exclude all results that do not match required terms`, async () => {
+    it(`should bring back all results 
+       when empty string/array is passed`, async () => {
 
       const info = await view.get()
       expect(info.name).to.be.a('string')
@@ -93,18 +94,16 @@ describe("boolean search logic", () => {
       let has = cursor.hasNext()
       expect(has).to.be.ok
 
-      let result = await cursor.next()
-      expect(result.title).to.match(/doc/)
+      let result = await cursor.all()
+      expect(result).to.have.length(2)
     })
   })
 
-  describe('ANDS', () => {
-    it(`only bring back results that include required words and phrases`, async () => {
-
+  describe('ANDS', async () => {
+    it(`should bring back only results matching AND'ed values
+       when +'ed PHRASE's are passed`, async () => {
       const info = await view.get()
       expect(info.name).to.be.a('string')
-
-      /* phrase */
       let query = {
         view: info.name,
         collections: [ {
@@ -114,8 +113,8 @@ describe("boolean search logic", () => {
         /* should match both results */
         terms: '+"word"'
       }
+
       let aqlQuery = buildAQL(query)
-      expect(Object.keys(aqlQuery.bindVars)).to.have.length(6)
 
       /* should match 2 documents */
       let cursor = await db.query(aqlQuery)
@@ -123,11 +122,6 @@ describe("boolean search logic", () => {
       let result = await cursor.next()
       expect(cursor.hasNext()).to.be.ok
       await cursor.next()
-      expect(cursor.hasNext()).to.not.be.ok
-
-      /* should match 0 documents */
-      query.terms = '+"wyuxaouw"'
-      cursor = await db.query(buildAQL(query))
       expect(cursor.hasNext()).to.not.be.ok
 
       /* should match 1 document */
@@ -138,6 +132,7 @@ describe("boolean search logic", () => {
       expect(result).to.have.length(1)
       expect(result[ 0 ].title).to.equal('doc A')
 
+      /* should match 1 document */
       query.terms = '+"across"'
       cursor = await db.query(buildAQL(query))
       expect(cursor.hasNext()).to.be.ok
@@ -146,37 +141,58 @@ describe("boolean search logic", () => {
       expect(result[ 0 ].title).to.equal('doc B')
       expect(cursor.hasNext()).to.not.be.ok
 
-
-      query.terms = '+"nowhere found"'
+      /* should match 0 documents */
+      query.terms = '+"wyuxaouw"'
       cursor = await db.query(buildAQL(query))
       expect(cursor.hasNext()).to.not.be.ok
 
-      /* tokens */
-      query = {
+      /* should match 0 documents */
+      query.terms = '+"nowhere found"'
+      cursor = await db.query(buildAQL(query))
+      expect(cursor.hasNext()).to.not.be.ok
+    })
+
+    it(`should bring back only results matching AND'ed values
+       when +'ed TOKEN's are passed`, async () => {
+
+      const info = await view.get()
+      expect(info.name).to.be.a('string')
+      let query = {
         view: info.name,
         collections: [ {
           name: collectionName,
           analyzer: 'text_en'
         } ],
+        /* should match both results */
         terms: '+word'
       }
+
+      /* should bring back 2 document */
+      let aqlQuery = buildAQL(query)
+      let cursor = await db.query(aqlQuery)
+      expect(cursor.hasNext()).to.be.ok
+      let result = await cursor.all()
+      expect(result).to.have.length(2)
+
+      /* should bring back 1 document */
+      // in A
+      query.terms = 'not in only in is in'
       aqlQuery = buildAQL(query)
-
-      expect(Object.keys(aqlQuery.bindVars)).to.have.length(7)
-      expect(aqlQuery.bindVars.value0).to.equal('word')
-      expect(aqlQuery.bindVars.value1).to.equal('text_en')
-      expect(aqlQuery.bindVars.value2).to.equal('text')
-      expect(aqlQuery.bindVars.value3).to.equal(1)
-      expect(aqlQuery.bindVars.value4).to.deep.equal({ collections: [ collectionName ] })
-      expect(aqlQuery.bindVars.value5).to.equal(0)
-      expect(aqlQuery.bindVars.value6).to.equal(20)
-
       cursor = await db.query(aqlQuery)
       expect(cursor.hasNext()).to.be.ok
+      result = await cursor.all()
+      expect(result).to.have.length(1)
+      expect(result[ 0 ].title).to.equal('doc A')
 
-      result = await cursor.next()
-      expect(result.title).to.deep.equal('doc A')
+      // sample B
+      /* should bring back 1 document, partially testing text_en analyzer */
+      query.terms = 'samples of things'
+      aqlQuery = buildAQL(query)
+      cursor = await db.query(aqlQuery)
       expect(cursor.hasNext()).to.be.ok
+      result = await cursor.all()
+      expect(result).to.have.length(1)
+      expect(result[ 0 ].title).to.equal('doc B')
     })
   })
 
