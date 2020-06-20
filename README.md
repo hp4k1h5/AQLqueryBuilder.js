@@ -16,7 +16,7 @@ For example, passing a search phrase like: `some +words -not +"phrase search"
 -"not these" ?"could have"` to `buildAQL`'s query object as the `term` key,
 will produce a query like the following:
 
-```asx
+```c
   FOR doc IN view
 
 SEARCH
@@ -48,6 +48,7 @@ SEARCH
     LIMIT "phrase search"0, "phrase search"1
   RETURN doc`
 ```
+n.b. the above code block is sytled with c but is .aql compatible.
 
 This query will retrieve all documents that __include__ the term "mandatory"
 AND __do not include__ the term "exclude", AND whose ranking will be boosted by the
