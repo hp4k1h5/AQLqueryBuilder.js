@@ -15,6 +15,9 @@
     "type": "git",
     "url": "git+ssh://git@github.com/HP4k1h5/AQLqueryBuilder.js.git"
   },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "description": "a typescript query builder for the Arango Query Language (AQL) via ArangoSearch",
   "keywords": [
     "AQL",
