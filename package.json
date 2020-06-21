@@ -2,7 +2,7 @@
   "name": "@hp4k1h5/aqlquerybuilder.js",
   "version": "0.0.4",
   "license": "MIT",
-  "main": "./built/index.d.ts",
+  "main": "./built/index.js",
   "scripts": {
     "test": "mocha -r ts-node/register",
     "tests": "mocha -r ts-node/register 'tests/*.ts'",
