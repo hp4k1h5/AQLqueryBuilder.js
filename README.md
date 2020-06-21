@@ -74,6 +74,8 @@ If multiple collections are passed, the above query is essentially replicated
 across all collections, see examples in 'tests/cols.ts'. In the future this
 will also accommodate multiple key searches.
 
+
+___
 ## setup
 
 1) running generated AQL queries will require a working arangodb instance.
@@ -81,11 +83,12 @@ will also accommodate multiple key searches.
 ## installation
 currently there is only support for server-side use.
 
-1) clone this repository in your node compatible project.
-2) run `yarn add @hp4klh5/AQLqueryBuilder.js`
+1) clone this repository in your node compatible project.  
+   __or__  
+   run `yarn add @hp4klh5/AQLqueryBuilder.js`  
     or `npm install --save @hp4klh5/AQLqueryBuilder.js`  
     in a directory containing a `package.json` file.
-3) import/require the exported functions
+2) import/require the exported functions
 ```js
 // use either
 import {buildAQL} from '@hp4klh5/AQLqueryBuilder.js'
@@ -193,6 +196,8 @@ ___
 }
 ```
 
+
+___
 ### boolean search logic
 
 Quoting [mit's Database Search Tips](https://libguides.mit.edu/c.php?g=175963&p=1158594):
@@ -237,6 +242,7 @@ optional and is counted as an `OR`.
 
 Please see [tests/parse.ts](tests/parse.ts) for more examples.
 
+
 #### Example
 
 input `one +two -"buckle my shoe"` and `parseQuery()` will interpret that
@@ -270,6 +276,8 @@ only Document B is returned;
 Document A is excluded by the phrase "buckle my shoe"  
 Document C does not contain the mandatory word "two"
 
+
+___
 ## bugs
 plase see [bugs](https://github.com/HP4k1h5/AQLqueryBuilder.js/issues/new?assignees=HP4k1h5&labels=bug&template=bug_report.md&title=basic)
 ## contributing
