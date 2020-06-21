@@ -1,2 +1,7 @@
 ./src
 ./tests
+built/
+node_modules/
+yarn.lock
+docs/
+**/*.wiki
