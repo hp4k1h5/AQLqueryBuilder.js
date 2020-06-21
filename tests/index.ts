@@ -13,119 +13,21 @@ describe('index.ts', () => {
 
     expect(() => buildAQL({ view: 'view', collections: [], terms: [] })).to.throw(/query.collections must have at least one name/)
   })
-})
 
-describe('buildAQL', () => {
-  it(`should return an aql object
-     when an empty string is passed for query terms`, () => {
-    let query = { view: 'view', collections: [ { name: 'coll', analyzer: 'analyzer' } ], terms: '' }
-    const builtAQL = buildAQL(query)
-    expect(builtAQL).to.be.an('object')
-
-    expect(builtAQL.query).to.equal(`
-    FOR doc IN view
-      
-  SEARCH 
-     
-    
-    
-    @value0
-    OPTIONS @value1
-      SORT TFIDF(doc) DESC
-      
-      LIMIT @value2, @value3
-    RETURN doc`
-    )
+  it(`should be importable by a .ts compatible module 
+     without compilation `, () => {
+    /* TODO  run a tsc process to demonstrate importing this library as is */
+    /* manual test: ✅ works (2020/06/21) */
   })
 
-  it(`should return an aql object
-     when an empty array is passed for query terms`, () => {
-    let query = { view: 'view', collections: [ { name: 'coll', analyzer: 'analyzer' } ], terms: [] }
-    const builtAQL = buildAQL(query)
-    expect(builtAQL).to.be.an('object')
+  it(`should compile to an npm installable module`, () => {
 
-    expect(builtAQL.query).to.equal(`
-    FOR doc IN view
-      
-  SEARCH 
-     
-    
-    
-    @value0
-    OPTIONS @value1
-      SORT TFIDF(doc) DESC
-      
-      LIMIT @value2, @value3
-    RETURN doc`
-    )
+    /* TODO run a node process to npm i --save the parent module */
+    /* manual test: ✅ works (2020/06/21) */
   })
 
-  it(`should return an aql object
-     when a phrase string is passed for query terms`, () => {
-    let query = { view: 'view', collections: [ { name: 'coll', analyzer: 'analyzer' } ], terms: '"phrase search"' }
-    const builtAQL = buildAQL(query)
-    expect(builtAQL).to.be.an('object')
-
-    expect(builtAQL.query).to.equal(`
-    FOR doc IN view
-      
-  SEARCH 
-     
-    (PHRASE(doc.@value0, @value1, @value2))
-    
-    
-    OPTIONS @value3
-      SORT TFIDF(doc) DESC
-      
-      LIMIT @value4, @value5
-    RETURN doc`)
-  })
-
-  it(`should handle basic boolean cases`, () => {
-    let query = { view: 'view', collections: [ { name: 'coll', analyzer: 'analyzer' } ], terms: '-"hope"' }
-
-    const builtAQL = buildAQL(query)
-    expect(builtAQL).to.be.an('object')
-    expect(builtAQL.query).to.equal(`
-    FOR doc IN view
-      
-  SEARCH 
-     
-    
-     
-     NOT  (PHRASE(doc.@value0, @value1, @value2))
-     
-    
-    OPTIONS @value3
-      SORT TFIDF(doc) DESC
-      
-      LIMIT @value4, @value5
-    RETURN doc`)
-  })
-
-  it(`should handle basic boolean cases`, () => {
-    let query = { view: 'view', collections: [ { name: 'coll', analyzer: 'analyzer' } ], terms: '-hope' }
-
-    const builtAQL = buildAQL(query)
-    expect(builtAQL).to.be.an('object')
-    expect(builtAQL.query).to.equal(`
-    FOR doc IN view
-      
-  SEARCH 
-     
-    
-     
-     
-     MIN_MATCH(
-      ANALYZER(
-        TOKENS(@value0, @value1)
-        NONE IN doc.@value2, @value1), 
-    @value3)
-    
-    OPTIONS @value4
-      SORT TFIDF(doc) DESC
-      
-      LIMIT @value5, @value6
-    RETURN doc`)
+  it(`should compile to a .js compatible module`, () => {
+    /* TODO run a node subprocess and call a .js file that uses rquire() */
+    /* manual test: ✅ works (2020/06/21) */
   })
 })

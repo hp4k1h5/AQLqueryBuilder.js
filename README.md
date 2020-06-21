@@ -1,20 +1,31 @@
 # AQLqueryBuilder.js
 > a typescript query builder for [arangodb](https://www.arangodb.com)'s [ArangoSearch](https://www.arangodb.com/docs/stable/arangosearch.html)
 
-##### !! warning !! experimental and unstable
+##### ! pre-alpha (v0.0.X)
+- [ overview ](#overview)
+- [ setup](#setup)
+  - [ installation](#installation)
+- [ usage](#usage)
+  - [ query object](#query-object)
+  - [ boolean search logic](#boolean-search-logic)
+  - [ default query syntax](#default-query-syntax)
+  - [ Example](#Example)
+- [ bugs](#bugs)
+- [ contributing](#contributing)
 
 ## overview
+
 ArangoSearch provides a low-level API for interacting with Arango Search Views
 through the Arango Query Language (AQL). This library aims to provide a query
 parser and AQL query builder to enable full boolean search operations across
 all available Arango Search View capabilities, including, `PHRASE` and
 `TOKENS` operations. With minimal syntax overhead the user can generate
-multi-lingual and language-specific, complex phrase, (proximity... TBD) and tokenized
-search terms.
+multi-lingual and language-specific, complex phrase, (proximity... TBD) and
+tokenized search terms.
 
 For example, passing a search phrase like: `some +words -not +"phrase search"
--"not these" ?"could have"` to `buildAQL`'s query object as the `term` key,
-will produce a query like the following:
+-"not these" ?"could have"` to `buildAQL()`, will produce a query like the
+following (see [this example](#query-example) and those found in `tests/`:
 
 ```c
   FOR doc IN view
@@ -51,34 +62,39 @@ SEARCH
 n.b. the above code block is styled with c but is .aql compatible.
 
 This query will retrieve all documents that __include__ the term "mandatory"
-AND __do not include__ the term "exclude", AND whose ranking will be boosted by the
-presence of the phrase "optional phrase". If no mandatory or exclude terms are
-provided, optional terms are considered required, so as not to retrieve all
-documents.
+AND __do not include__ the term "exclude", AND whose ranking will be boosted
+by the presence of the phrase "optional phrase". If no mandatory or exclude
+terms are provided, optional terms are considered required, so as not to
+retrieve all documents.
 
 See [default query syntax](#default-query-syntax) and this schematic
 [example](#example) for more details.
 
-If multiple collections are passed, the above queried is essentially
-replicated across all collections, see examples in 'tests/cols.ts'. In the
-future this will also accommodate multiple key searches.
+If multiple collections are passed, the above query is essentially replicated
+across all collections, see examples in 'tests/cols.ts'. In the future this
+will also accommodate multiple key searches.
 
 ## setup
 
-1) running generated AQL queries will require a working arangodb instance. In
-the future, it is hoped that this package can be imported and used in the
-`arangosh`, as well as client and server side. Currently there is only limited
-support for server-side use.
+1) running generated AQL queries will require a working arangodb instance.
 
 ## installation
+currently there is only support for server-side use.
 
-!! packaging and export behavior is not stable, and is likely to change
-!! significantly in the short-term
-1) clone this repository in your es6 compatible project.
-2) run `yarn install` from the project directory.
-3) unless you are importing into a typescript project, i believe you will have
-to run `yarn tsc` from the project directory, and possibly change the compile
-target in `tsconfig.json`
+1) clone this repository in your node compatible project.
+2) run `yarn add @hp4klh5/AQLqueryBuilder.js`
+    or `npm install --save @hp4klh5/AQLqueryBuilder.js`  
+    in a directory containing a `package.json` file.
+3) import/require the exported functions
+```js
+// use either
+import {buildAQL} from '@hp4klh5/AQLqueryBuilder.js'
+// or
+const {buildAQL} = require('@hp4klh5/AQLqueryBuilder.js')
+```
+  This has been tested for
+  - ✅ node v14.4.0
+  - ✅ typescript v3.9.5
 
 ## usage
 __for up-to-date documentation, run `yarn doc && serve docs/` from the project
@@ -94,23 +110,25 @@ query against is indexed by an ArangoSearch View, and that all documents index
 the same exact field. This field, passed to the builder as a key on the
 `query` object passed to e.g. `buildAQL()`, can be indexed by any number of
 analyzers, and the query will target all supplied collections simultaneously.
-This allows for true multi-language search provided all documents index the
-same key as all other documents in the view. While there are plans to expand
-on this functionality to provide multi-key search, this library is primarily
-built for academic and textual searches, and is ideally suited for documents
-like books, articles, and other media where most of the data resides in a
-single place, i.e. document `key`, or `field`.
+This allows for true multi-language search, provided all analyzers and
+indexers index the same key as all other documents in the view. While there
+are plans to expand on this functionality to provide multi-key search, this
+library is primarily built for academic and textual searches, and is ideally
+suited for documents like books, articles, and other media where most of the
+data resides in a single place, i.e. document `key`, or `field`.
 
-This works best as a document query tool. Leveraging ArangoSearch's built-in
-language stemming analyzers allows for complex search phrases to be run
-against any number of language-specific collections simultaneously.
+AQLqueryBuilder works best as a document query tool. Leveraging ArangoSearch's
+built-in language stemming analyzers allows for complex search phrases to be
+run against any number of language-specific collections simultaneously.
 
 For an example of a multi-lingual document ingest/parser/indexer, please see
-[ptolemy's curator](https://gitlab.com/HP4k1h5/nineveh/-/tree/master/ptolemy/dimitri/curator.js)
+[ptolemy's
+curator](https://gitlab.com/HP4k1h5/nineveh/-/tree/master/ptolemy/dimitri/curator.js)
 
 __Example:__
 ```javascript
-import {buildAQL} from 'path/to/AQLqueryBuilder'
+import {buildAQL} from '@hp4klh5/AQLqueryBuilder.js'
+
 const queryObject = {
   "view": "the_arango-search_view-name",
   "collections": [{
@@ -119,12 +137,15 @@ const queryObject = {
   }],
   "query": "+'query string' -for +parseQuery ?to parse"
 }
+
 const aqlQuery = buildAQL(queryObject)
+
 // ... const cursor = await db.query(aqlQuery)
 // ... const cursor = await db.query(buildAQL(queryObject, {start:20, end:40})
 ```
-`collections` is an array of `collection` objects. This allows searching and
-filtering across collections impacted by the search.
+
+Generate documenation with `yarn doc && serve docs/` or see more examples in
+e.g. [tests/search.ts](tests/search.ts)
 
 ### query object
 
@@ -145,7 +166,7 @@ within.
 
 ___
 
-Example:
+#### `query` Example
 ```json
 {
   "view": "the_arango-search_view-name",
@@ -203,8 +224,9 @@ Quoting [mit's Database Search Tips](https://libguides.mit.edu/c.php?g=175963&p=
 for more information on boolean search logic see
   [above](#boolean-search-logic)
 
-The default syntax accepted by `AQLqueryBuilder`'s `query` object's `terms`
-key is as follows:
+The default syntax accepted by `buildAQL()`'s query paramter key `terms` when
+passing in a string, instead of a `term` interface compatible array is as
+follows:
 
 1) Everything inside single or double quotes is considered a `PHRASE`
 2) Everything else is considered a word to be analyzed by `TOKENS`
@@ -213,9 +235,12 @@ by one of the following symbols `+ ? -`, or the plus-sign, the question-mark,
 and the minus-sign. If a word has no operator prefix, it is considered
 optional and is counted as an `OR`.
 
+Please see [tests/parse.ts](tests/parse.ts) for more examples.
+
 #### Example
-input `one +two -"buckle my shoe"` and the queryParser will interpret as
-follows:
+
+input `one +two -"buckle my shoe"` and `parseQuery()` will interpret that
+query string as follows:
 
 |        | ANDS | ORS | NOTS             |
 | -      | -    | -   | -                |
