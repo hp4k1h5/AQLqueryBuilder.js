@@ -1,6 +1,6 @@
 {
   "name": "@hp4k1h5/aqlquerybuilder.js",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "main": "./built/index.js",
   "scripts": {
@@ -11,7 +11,7 @@
   "homepage": "https://github.com/HP4k1h5/AQLqueryBuilder.js",
   "repository": {
     "type": "git",
-    "url": "git@github.com:HP4k1h5/AQLqueryBuilder.js.git"
+    "url": "git+ssh://git@github.com/HP4k1h5/AQLqueryBuilder.js.git"
   },
   "description": "a typescript query builder for the Arango Query Language (AQL) via ArangoSearch",
   "keywords": [
@@ -39,5 +39,12 @@
     "typescript": "^3.9.5"
   },
   "author": "HP4k1h5",
-  "email": "robertwalks@gmail.com"
+  "email": "robertwalks@gmail.com",
+  "bugs": {
+    "url": "https://github.com/HP4k1h5/AQLqueryBuilder.js/issues"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  }
 }
