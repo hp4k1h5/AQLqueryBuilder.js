@@ -4,6 +4,8 @@
   "license": "MIT",
   "main": "./built/index.js",
   "scripts": {
+    "build": "yarn tsc",
+    "print": "yarn build && yarn doc && yarn tests && npm publish --access public",
     "test": "mocha -r ts-node/register",
     "tests": "mocha -r ts-node/register 'tests/*.ts'",
     "doc": "typedoc --plugin none src/"
