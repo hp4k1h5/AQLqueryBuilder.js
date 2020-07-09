@@ -143,6 +143,7 @@ SEARCH
 				<p>If multiple collections are passed, the above query is essentially replicated
 					across all collections, see examples in &#39;tests/cols.ts&#39;. In the future this
 				will also accommodate multiple key searches.</p>
+				<hr>
 				<a href="#setup" id="setup" style="color: inherit; text-decoration: none;">
 					<h2>setup</h2>
 				</a>
@@ -151,10 +152,8 @@ SEARCH
 					<h2>installation</h2>
 				</a>
 				<p>currently there is only support for server-side use.</p>
-				<p>1) clone this repository in your node compatible project.
-					2) run <code>yarn add @hp4klh5/AQLqueryBuilder.js</code>
-					or <code>npm install --save @hp4klh5/AQLqueryBuilder.js</code><br>    in a directory containing a <code>package.json</code> file.
-				3) import/require the exported functions</p>
+				<p>1) clone this repository in your node compatible project.<br>   <strong>or</strong><br>   run <code>yarn add @hp4klh5/AQLqueryBuilder.js</code><br>    or <code>npm install --save @hp4klh5/AQLqueryBuilder.js</code><br>    in a directory containing a <code>package.json</code> file.
+				2) import/require the exported functions</p>
 				<pre><code class="language-js"><span class="hljs-comment">// use either</span>
 <span class="hljs-keyword">import</span> {buildAQL} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@hp4klh5/AQLqueryBuilder.js&#x27;</span>
 <span class="hljs-comment">// or</span>
@@ -247,6 +246,7 @@ SEARCH
     }
   ]
 }</code></pre>
+				<hr>
 				<a href="#boolean-search-logic" id="boolean-search-logic" style="color: inherit; text-decoration: none;">
 					<h3>boolean search logic</h3>
 				</a>
@@ -337,6 +337,7 @@ SEARCH
 ┃    buckle my shoe┃  ┃                  ┃  ┃                  ┃
 ┗━━━━━━━━━━━━━━━━━━┛  ┗━━━━━━━━━━━━━━━━━━┛  ┗━━━━━━━━━━━━━━━━━━┛</code></pre>
 				<p>only Document B is returned;<br>Document A is excluded by the phrase &quot;buckle my shoe&quot;<br>Document C does not contain the mandatory word &quot;two&quot;</p>
+				<hr>
 				<a href="#bugs" id="bugs" style="color: inherit; text-decoration: none;">
 					<h2>bugs</h2>
 				</a>
@@ -395,6 +396,5 @@ SEARCH
 </div>
 <div class="overlay"></div>
 <script src="assets/js/main.js"></script>
-<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>
