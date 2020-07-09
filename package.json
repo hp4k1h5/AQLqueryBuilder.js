@@ -1,8 +1,9 @@
 {
   "name": "@hp4k1h5/aqlquerybuilder.js",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "license": "MIT",
-  "main": "./built/index.js",
+  "main": "built/index.js",
+  "types": "built/index.d.ts",
   "scripts": {
     "build": "yarn tsc",
     "print": "yarn build && yarn doc && yarn tests && npm publish --access public",
