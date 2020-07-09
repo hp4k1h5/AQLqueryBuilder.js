@@ -23,9 +23,13 @@ all available Arango Search View capabilities, including, `PHRASE` and
 multi-lingual and language-specific, complex phrase, (proximity... TBD) and
 tokenized search terms.
 
-For example, passing a search phrase like: `some +words -not +"phrase search"
--"not these" ?"could have"` to `buildAQL()`, will produce a query like the
-following (see [this example](#query-example) and those found in `tests/`:
+For example, passing a search phrase like:
+```txt
+some +words -not +"phrase search" -"not these" ?"could have"`
+```
+to `buildAQL()`'s `query` parameter, will
+produce a query like the following (see [this example](#query-example) and
+those found in `tests/`:
 
 ```c
   FOR doc IN view
@@ -56,10 +60,9 @@ SEARCH
   OPTIONS {"collections": ["col"]}
     SORT TFIDF(doc) DESC
 
-    LIMIT "phrase search"0, "phrase search"1
+    LIMIT 0, 1
   RETURN doc`
 ```
-n.b. the above code block is styled with c but is .aql compatible.
 
 This query will retrieve all documents that __include__ the term "mandatory"
 AND __do not include__ the term "exclude", AND whose ranking will be boosted
@@ -70,24 +73,24 @@ retrieve all documents.
 See [default query syntax](#default-query-syntax) and this schematic
 [example](#example) for more details.
 
-If multiple collections are passed, the above query is essentially replicated
-across all collections, see examples in 'tests/cols.ts'. In the future this
-will also accommodate multiple key searches.
-
+If multiple collections are passed, the above query is replicated across all
+passed collections, see examples in 'tests/cols.ts'. In the future this will
+also accommodate multiple key searches.
 
 ___
 ## setup
 
-1) running generated AQL queries will require a working arangodb instance.
+1) running generated AQL queries will require a running arangodb instance.
 
 ## installation
 currently there is only support for server-side use.
 
-1) clone this repository in your node compatible project.  
-   __or__  
-   run `yarn add @hp4klh5/AQLqueryBuilder.js`  
+1) run `yarn add @hp4klh5/AQLqueryBuilder.js`  
     or `npm install --save @hp4klh5/AQLqueryBuilder.js`  
-    in a directory containing a `package.json` file.
+    in a directory containing a `package.json` file.  
+   __or__  
+  clone this repository in your node compatible project.
+
 2) import/require the exported functions
 ```js
 // use either
@@ -124,9 +127,6 @@ AQLqueryBuilder works best as a document query tool. Leveraging ArangoSearch's
 built-in language stemming analyzers allows for complex search phrases to be
 run against any number of language-specific collections simultaneously.
 
-For an example of a multi-lingual document ingest/parser/indexer, please see
-[ptolemy's
-curator](https://gitlab.com/HP4k1h5/nineveh/-/tree/master/ptolemy/dimitri/curator.js)
 
 __Example:__
 ```javascript
@@ -144,7 +144,7 @@ const queryObject = {
 const aqlQuery = buildAQL(queryObject)
 
 // ... const cursor = await db.query(aqlQuery)
-// ... const cursor = await db.query(buildAQL(queryObject, {start:20, end:40})
+// ... const cursor = await db.query(buildAQL(queryObject, {start:21, end:40})
 ```
 
 Generate documenation with `yarn doc && serve docs/` or see more examples in
@@ -159,8 +159,8 @@ will be run against
 
 • **collections** (required): the names of the collections indexed by @view to query
 
-• **terms** (required): either an array of @term interfaces or a string to be
-parsed by @parseQuery
+• **terms** (required): either an array of `term` interfaces or a string to be
+parsed by `parseQuery`
 
 • **key** (optional | default: "text"): the name of the Arango document key to search
 within.
@@ -183,7 +183,7 @@ ___
   "key": "text",
   "query": "either a +query ?\"string for parseQuery to parse\"",
   "query": [
-           {"type": "phr", "op": "?", "val": "\"or a list of query objects\""},
+           {"type": "phr", "op": "?", "val": "\"!!! OR a list of query objects\""},
            {"type": "tok", "op": "-", "val": "tokens"}
          ],
   "filters": [
@@ -276,10 +276,11 @@ only Document B is returned;
 Document A is excluded by the phrase "buckle my shoe"  
 Document C does not contain the mandatory word "two"
 
-
 ___
+
 ## bugs
-plase see [bugs](https://github.com/HP4k1h5/AQLqueryBuilder.js/issues/new?assignees=HP4k1h5&labels=bug&template=bug_report.md&title=basic)
+please see [bugs](https://github.com/HP4k1h5/AQLqueryBuilder.js/issues/new?assignees=HP4k1h5&labels=bug&template=bug_report.md&title=basic)
+
 ## contributing
-plase see [./.github/CONTRIBUTING.md]
+please see [./.github/CONTRIBUTING.md]
 

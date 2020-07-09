@@ -3,14 +3,25 @@ var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cook
     if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
     return cooked;
 };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
 exports.__esModule = true;
 exports.buildAQL = void 0;
 var arangojs_1 = require("arangojs");
 var search_1 = require("./search");
 var filter_1 = require("./filter");
-/** @returns an AQL query object. See @param query for details on required
- * values. @parm query .terms accepts either a string to be parsed or an array
- * of @param term
+var filter_2 = require("./filter");
+__createBinding(exports, filter_2, "buildFilters");
+var parse_1 = require("./parse");
+__createBinding(exports, parse_1, "parseQuery");
+/** @returns an AQL query object. See @param query for
+ * details on required values. @param query.terms accepts
+ * either a string to be parsed or an array of terms. @param limit is an object with keys `start` default 0, and `end` default 20.
  * */
 function buildAQL(query, limit) {
     if (limit === void 0) { limit = { start: 0, end: 20 }; }
