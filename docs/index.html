@@ -1,0 +1,400 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@hp4k1h5/aqlquerybuilder.js</title>
+	<meta name="description" content="Documentation for @hp4k1h5/aqlquerybuilder.js">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@hp4k1h5/aqlquerybuilder.js</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1>@hp4k1h5/aqlquerybuilder.js</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#aqlquerybuilderjs" id="aqlquerybuilderjs" style="color: inherit; text-decoration: none;">
+					<h1>AQLqueryBuilder.js</h1>
+				</a>
+				<blockquote>
+					<p>a typescript query builder for <a href="https://www.arangodb.com">arangodb</a>&#39;s <a href="https://www.arangodb.com/docs/stable/arangosearch.html">ArangoSearch</a></p>
+				</blockquote>
+				<a href="#-pre-alpha-v00x" id="-pre-alpha-v00x" style="color: inherit; text-decoration: none;">
+					<h5>! pre-alpha (v0.0.X)</h5>
+				</a>
+				<ul>
+					<li><a href="#overview"> overview </a></li>
+					<li><a href="#setup"> setup</a><ul>
+							<li><a href="#installation"> installation</a></li>
+						</ul>
+					</li>
+					<li><a href="#usage"> usage</a><ul>
+							<li><a href="#query-object"> query object</a></li>
+							<li><a href="#boolean-search-logic"> boolean search logic</a></li>
+							<li><a href="#default-query-syntax"> default query syntax</a></li>
+							<li><a href="#Example"> Example</a></li>
+						</ul>
+					</li>
+					<li><a href="#bugs"> bugs</a></li>
+					<li><a href="#contributing"> contributing</a></li>
+				</ul>
+				<a href="#overview" id="overview" style="color: inherit; text-decoration: none;">
+					<h2>overview</h2>
+				</a>
+				<p>ArangoSearch provides a low-level API for interacting with Arango Search Views
+					through the Arango Query Language (AQL). This library aims to provide a query
+					parser and AQL query builder to enable full boolean search operations across
+					all available Arango Search View capabilities, including, <code>PHRASE</code> and
+					<code>TOKENS</code> operations. With minimal syntax overhead the user can generate
+					multi-lingual and language-specific, complex phrase, (proximity... TBD) and
+				tokenized search terms.</p>
+				<p>For example, passing a search phrase like: <code>some +words -not +&quot;phrase search&quot;
+-&quot;not these&quot; ?&quot;could have&quot;</code> to <code>buildAQL()</code>, will produce a query like the
+				following (see <a href="#query-example">this example</a> and those found in <code>tests/</code>:</p>
+				<pre><code class="language-c">  FOR doc IN view
+
+SEARCH
+  (PHRASE(doc.text, &quot;phrase search&quot;, analyzer)) AND MIN_MATCH(
+    ANALYZER(
+      TOKENS(&quot;words&quot;, analyzer)
+      ALL IN doc.text, analyzer),
+  1) OR ((PHRASE(doc.text, &quot;phrase search&quot;, analyzer)) AND MIN_MATCH(
+    ANALYZER(
+      TOKENS(&quot;words&quot;, analyzer)
+      ALL IN doc.text, analyzer),
+  1) AND (PHRASE(doc.text, &quot;could have&quot;, analyzer)) OR MIN_MATCH(
+    ANALYZER(
+      TOKENS(other, analyzer)
+      ANY IN doc.text, analyzer),
+  1))
+
+   AND  
+   NOT  (PHRASE(doc.text, &quot;not these&quot;, analyzer))
+   AND  MIN_MATCH(
+    ANALYZER(
+      TOKENS(&quot;nor&quot;, analyzer)
+      NONE IN doc.text, analyzer),
+  1)
+
+  OPTIONS {&quot;collections&quot;: [&quot;col&quot;]}
+    SORT TFIDF(doc) DESC
+
+    LIMIT &quot;phrase search&quot;0, &quot;phrase search&quot;1
+  RETURN doc`</code></pre>
+				<p>n.b. the above code block is styled with c but is .aql compatible.</p>
+				<p>This query will retrieve all documents that <strong>include</strong> the term &quot;mandatory&quot;
+					AND <strong>do not include</strong> the term &quot;exclude&quot;, AND whose ranking will be boosted
+					by the presence of the phrase &quot;optional phrase&quot;. If no mandatory or exclude
+					terms are provided, optional terms are considered required, so as not to
+				retrieve all documents.</p>
+				<p>See <a href="#default-query-syntax">default query syntax</a> and this schematic
+				<a href="#example">example</a> for more details.</p>
+				<p>If multiple collections are passed, the above query is essentially replicated
+					across all collections, see examples in &#39;tests/cols.ts&#39;. In the future this
+				will also accommodate multiple key searches.</p>
+				<a href="#setup" id="setup" style="color: inherit; text-decoration: none;">
+					<h2>setup</h2>
+				</a>
+				<p>1) running generated AQL queries will require a working arangodb instance.</p>
+				<a href="#installation" id="installation" style="color: inherit; text-decoration: none;">
+					<h2>installation</h2>
+				</a>
+				<p>currently there is only support for server-side use.</p>
+				<p>1) clone this repository in your node compatible project.
+					2) run <code>yarn add @hp4klh5/AQLqueryBuilder.js</code>
+					or <code>npm install --save @hp4klh5/AQLqueryBuilder.js</code><br>    in a directory containing a <code>package.json</code> file.
+				3) import/require the exported functions</p>
+				<pre><code class="language-js"><span class="hljs-comment">// use either</span>
+<span class="hljs-keyword">import</span> {buildAQL} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@hp4klh5/AQLqueryBuilder.js&#x27;</span>
+<span class="hljs-comment">// or</span>
+<span class="hljs-keyword">const</span> {buildAQL} = <span class="hljs-built_in">require</span>(<span class="hljs-string">&#x27;@hp4klh5/AQLqueryBuilder.js&#x27;</span>)</code></pre>
+				<p>  This has been tested for</p>
+				<ul>
+					<li>✅ node v14.4.0</li>
+					<li>✅ typescript v3.9.5</li>
+				</ul>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h2>usage</h2>
+				</a>
+				<p><strong>for up-to-date documentation, run <code>yarn doc &amp;&amp; serve docs/</code> from the project
+				directory root.</strong></p>
+				<p>AQLqueryBuilder aims to provide cross-collection and cross-language boolean
+					search capabilities to the library&#39;s user. Currently, this library makes a
+					number of assumptions about the way your data is stored and indexed, but these
+				are hopefully compatible with a wide range of setups.</p>
+				<p>The primary assumption this library makes is that the data you are trying to
+					query against is indexed by an ArangoSearch View, and that all documents index
+					the same exact field. This field, passed to the builder as a key on the
+					<code>query</code> object passed to e.g. <code>buildAQL()</code>, can be indexed by any number of
+					analyzers, and the query will target all supplied collections simultaneously.
+					This allows for true multi-language search, provided all analyzers and
+					indexers index the same key as all other documents in the view. While there
+					are plans to expand on this functionality to provide multi-key search, this
+					library is primarily built for academic and textual searches, and is ideally
+					suited for documents like books, articles, and other media where most of the
+				data resides in a single place, i.e. document <code>key</code>, or <code>field</code>.</p>
+				<p>AQLqueryBuilder works best as a document query tool. Leveraging ArangoSearch&#39;s
+					built-in language stemming analyzers allows for complex search phrases to be
+				run against any number of language-specific collections simultaneously.</p>
+				<p>For an example of a multi-lingual document ingest/parser/indexer, please see
+					<a href="https://gitlab.com/HP4k1h5/nineveh/-/tree/master/ptolemy/dimitri/curator.js">ptolemy&#39;s
+				curator</a></p>
+				<p><strong>Example:</strong></p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">import</span> {buildAQL} <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;@hp4klh5/AQLqueryBuilder.js&#x27;</span>
+
+<span class="hljs-keyword">const</span> queryObject = {
+  <span class="hljs-string">&quot;view&quot;</span>: <span class="hljs-string">&quot;the_arango-search_view-name&quot;</span>,
+  <span class="hljs-string">&quot;collections&quot;</span>: [{
+    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;collection_name&quot;</span>,
+    <span class="hljs-string">&quot;analyzer&quot;</span>: <span class="hljs-string">&quot;analyzer_name&quot;</span>
+  }],
+  <span class="hljs-string">&quot;query&quot;</span>: <span class="hljs-string">&quot;+&#x27;query string&#x27; -for +parseQuery ?to parse&quot;</span>
+}
+
+<span class="hljs-keyword">const</span> aqlQuery = buildAQL(queryObject)
+
+<span class="hljs-comment">// ... const cursor = await db.query(aqlQuery)</span>
+<span class="hljs-comment">// ... const cursor = await db.query(buildAQL(queryObject, {start:20, end:40})</span></code></pre>
+				<p>Generate documenation with <code>yarn doc &amp;&amp; serve docs/</code> or see more examples in
+				e.g. <a href="tests/search.ts">tests/search.ts</a></p>
+				<a href="#query-object" id="query-object" style="color: inherit; text-decoration: none;">
+					<h3>query object</h3>
+				</a>
+				<p><code>buildAQL</code> accepts an object with the following properties:</p>
+				<p>• <strong>view</strong>: <em>string</em> (required): the name of the ArangoSearch view the query
+				will be run against</p>
+				<p>• <strong>collections</strong> (required): the names of the collections indexed by @view to query</p>
+				<p>• <strong>terms</strong> (required): either an array of @term interfaces or a string to be
+				parsed by @parseQuery</p>
+				<p>• <strong>key</strong> (optional | default: &quot;text&quot;): the name of the Arango document key to search
+				within.</p>
+				<p>• <strong>filters</strong> (optional): a list of @filter interfaces</p>
+				<hr>
+				<a href="#query-example" id="query-example" style="color: inherit; text-decoration: none;">
+					<h4><code>query</code> Example</h4>
+				</a>
+				<pre><code class="language-json">{
+  <span class="hljs-attr">&quot;view&quot;</span>: <span class="hljs-string">&quot;the_arango-search_view-name&quot;</span>,
+  <span class="hljs-attr">&quot;collections&quot;</span>: [
+    {
+      <span class="hljs-attr">&quot;name&quot;</span>:
+      <span class="hljs-string">&quot;collection_name&quot;</span>, <span class="hljs-attr">&quot;analyzer&quot;</span>:
+       <span class="hljs-string">&quot;analyzer_name&quot;</span>
+    }
+  ],
+  <span class="hljs-attr">&quot;key&quot;</span>: <span class="hljs-string">&quot;text&quot;</span>,
+  <span class="hljs-attr">&quot;query&quot;</span>: <span class="hljs-string">&quot;either a +query ?\&quot;string for parseQuery to parse\&quot;&quot;</span>,
+  <span class="hljs-attr">&quot;query&quot;</span>: [
+           {<span class="hljs-attr">&quot;type&quot;</span>: <span class="hljs-string">&quot;phr&quot;</span>, <span class="hljs-attr">&quot;op&quot;</span>: <span class="hljs-string">&quot;?&quot;</span>, <span class="hljs-attr">&quot;val&quot;</span>: <span class="hljs-string">&quot;\&quot;or a list of query objects\&quot;&quot;</span>},
+           {<span class="hljs-attr">&quot;type&quot;</span>: <span class="hljs-string">&quot;tok&quot;</span>, <span class="hljs-attr">&quot;op&quot;</span>: <span class="hljs-string">&quot;-&quot;</span>, <span class="hljs-attr">&quot;val&quot;</span>: <span class="hljs-string">&quot;tokens&quot;</span>}
+         ],
+  <span class="hljs-attr">&quot;filters&quot;</span>: [
+    {
+      <span class="hljs-attr">&quot;field&quot;</span>: <span class="hljs-string">&quot;field_name&quot;</span>,
+      <span class="hljs-attr">&quot;op&quot;</span>: <span class="hljs-string">&quot;&gt;&quot;</span>,
+      <span class="hljs-attr">&quot;val&quot;</span>: <span class="hljs-number">0</span>
+    }
+  ]
+}</code></pre>
+				<a href="#boolean-search-logic" id="boolean-search-logic" style="color: inherit; text-decoration: none;">
+					<h3>boolean search logic</h3>
+				</a>
+				<p>Quoting <a href="https://libguides.mit.edu/c.php?g=175963&amp;p=1158594">mit&#39;s Database Search Tips</a>:</p>
+				<blockquote>
+					<p>Boolean operators form the basis of mathematical sets and database logic.
+						They connect your search words together to either narrow or broaden your
+					set of results.  The three basic boolean operators are: AND, OR, and NOT.</p>
+				</blockquote>
+				<a href="#-and" id="-and" style="color: inherit; text-decoration: none;">
+					<h4><code>+</code> AND</h4>
+				</a>
+				<ul>
+					<li>Mandatory terms and phrases. All results MUST INCLUDE these terms and
+					phrases.</li>
+				</ul>
+				<a href="#-or" id="-or" style="color: inherit; text-decoration: none;">
+					<h4><code>?</code> OR</h4>
+				</a>
+				<ul>
+					<li>Optional terms and phrases. If there are ANDS or NOTS, these serve as match
+						score &quot;boosters&quot;. If there are no ANDS or NOTS, ORS become required in
+					results.</li>
+				</ul>
+				<a href="#--not" id="--not" style="color: inherit; text-decoration: none;">
+					<h4><code>-</code> NOT</h4>
+				</a>
+				<ul>
+					<li>Search results MUST NOT INCLUDE these terms and phrases. If a result that
+						would otherwise have matched, contains one or more terms or phrases, it will
+						not be included in the result set. If there are no required or optional
+					terms, all results that do NOT match these terms will be returned.</li>
+				</ul>
+				<a href="#default-query-syntax" id="default-query-syntax" style="color: inherit; text-decoration: none;">
+					<h3>default query syntax</h3>
+				</a>
+				<p>for more information on boolean search logic see
+				<a href="#boolean-search-logic">above</a></p>
+				<p>The default syntax accepted by <code>buildAQL()</code>&#39;s query paramter key <code>terms</code> when
+					passing in a string, instead of a <code>term</code> interface compatible array is as
+				follows:</p>
+				<p>1) Everything inside single or double quotes is considered a <code>PHRASE</code>
+					2) Everything else is considered a word to be analyzed by <code>TOKENS</code>
+					3) Every individual search word and quoted phrase may be optionally prefixed
+					by one of the following symbols <code>+ ? -</code>, or the plus-sign, the question-mark,
+					and the minus-sign. If a word has no operator prefix, it is considered
+				optional and is counted as an <code>OR</code>.</p>
+				<p>Please see <a href="tests/parse.ts">tests/parse.ts</a> for more examples.</p>
+				<a href="#example" id="example" style="color: inherit; text-decoration: none;">
+					<h4>Example</h4>
+				</a>
+				<p>input <code>one +two -&quot;buckle my shoe&quot;</code> and <code>parseQuery()</code> will interpret that
+				query string as follows:</p>
+				<table>
+					<thead>
+						<tr>
+							<th></th>
+							<th>ANDS</th>
+							<th>ORS</th>
+							<th>NOTS</th>
+						</tr>
+					</thead>
+					<tbody><tr>
+							<td>PHRASE</td>
+							<td></td>
+							<td></td>
+							<td>&quot;buckle my shoe&quot;</td>
+						</tr>
+						<tr>
+							<td>TOKENS</td>
+							<td>two</td>
+							<td>one</td>
+							<td></td>
+						</tr>
+				</tbody></table>
+				<p>The generated AQL query, when run, will bring back only results that contain
+					&quot;two&quot;, that do not contain the phrase &quot;buckle my shoe&quot;, and that optionally
+					contain &quot;one&quot;. In this case, documents that contain &quot;one&quot; will be likely to
+				score higher than those that do not.</p>
+				<p>When the above phrase <code>one +two -&quot;buckle my shoe&quot;</code> is run against the
+				following documents:</p>
+				<pre><code class="language-boxcar">┏━━━━━━━━━━━━━━━━━━┓  ┏━━━━━━━━━━━━━━━━━━┓  ┏━━━━━━━━━━━━━━━━━━┓
+┃ Document A       ┃  ┃  Document B      ┃  ┃ Document C       ┃
+┃ ----------       ┃  ┃  ----------      ┃  ┃ ----------       ┃
+┃                  ┃  ┃ three four       ┃  ┃ one              ┃
+┃  one    two      ┃  ┃                  ┃  ┃                  ┃
+┃                  ┃  ┃ and two          ┃  ┃                  ┃
+┃    buckle my shoe┃  ┃                  ┃  ┃                  ┃
+┗━━━━━━━━━━━━━━━━━━┛  ┗━━━━━━━━━━━━━━━━━━┛  ┗━━━━━━━━━━━━━━━━━━┛</code></pre>
+				<p>only Document B is returned;<br>Document A is excluded by the phrase &quot;buckle my shoe&quot;<br>Document C does not contain the mandatory word &quot;two&quot;</p>
+				<a href="#bugs" id="bugs" style="color: inherit; text-decoration: none;">
+					<h2>bugs</h2>
+				</a>
+				<p>plase see <a href="https://github.com/HP4k1h5/AQLqueryBuilder.js/issues/new?assignees=HP4k1h5&amp;labels=bug&amp;template=bug_report.md&amp;title=basic">bugs</a></p>
+				<a href="#contributing" id="contributing" style="color: inherit; text-decoration: none;">
+					<h2>contributing</h2>
+				</a>
+				<p>plase see [./.github/CONTRIBUTING.md]</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_filter_.html">&quot;filter&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_index_.html">&quot;index&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_lib_structs_.html">&quot;lib/structs&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_parse_.html">&quot;parse&quot;</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/_search_.html">&quot;search&quot;</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>
