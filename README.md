@@ -1,7 +1,14 @@
 # AQLqueryBuilder.js
 > a typescript query builder for [arangodb](https://www.arangodb.com)'s [ArangoSearch](https://www.arangodb.com/docs/stable/arangosearch.html)
+See working demo at [hp4k1h5.github.io](https://hp4k1h5.github.io/#search-box).  
 
-##### ! pre-alpha (v0.0.X)
+**!Note** AQLqueryBuilder.js does NOT contain any code for the search bar, only the
+query string parser and AQL builder. Unabstracted code for the searchbar is
+located
+[here](https://github.com/HP4k1h5/hp4k1h5.github.io/tree/main/demos/src/components/search).
+![search bar demonstration with schematic query
+interface](./img/searchbar_demo.png)
+
 - [ overview ](#overview)
 - [ setup](#setup)
   - [ installation](#installation)
@@ -85,8 +92,8 @@ ___
 ## installation
 currently there is only support for server-side use.
 
-1) run `yarn add @hp4klh5/AQLqueryBuilder.js`  
-    or `npm install --save @hp4klh5/AQLqueryBuilder.js`  
+1) run `yarn add @hp4k1h5/AQLqueryBuilder.js`  
+    or `npm install --save @hp4k1h5/AQLqueryBuilder.js`  
     in a directory containing a `package.json` file.  
    __or__  
   clone this repository in your node compatible project.
@@ -94,9 +101,9 @@ currently there is only support for server-side use.
 2) import/require the exported functions
 ```js
 // use either
-import {buildAQL} from '@hp4klh5/AQLqueryBuilder.js'
+import {buildAQL, parseQuery} from '@hp4k1h5/AQLqueryBuilder.js'
 // or
-const {buildAQL} = require('@hp4klh5/AQLqueryBuilder.js')
+const {buildAQL} = require('@hp4k1h5/AQLqueryBuilder.js')
 ```
   This has been tested for
   - ✅ node v14.4.0
@@ -130,7 +137,7 @@ run against any number of language-specific collections simultaneously.
 
 __Example:__
 ```javascript
-import {buildAQL} from '@hp4klh5/AQLqueryBuilder.js'
+import {buildAQL} from '@hp4k1h5/AQLqueryBuilder.js'
 
 const queryObject = {
   "view": "the_arango-search_view-name",
