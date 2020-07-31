@@ -30,7 +30,7 @@ export function buildAQL(
     FOR doc IN ${aql.literal(query.view)}
       ${SEARCH}
       ${FILTER}
-      LIMIT ${limit.start}, ${limit.end}
+      LIMIT ${limit.start}, ${limit.count}
     RETURN doc`
 }
 

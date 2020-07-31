@@ -9,8 +9,9 @@ describe('whitespaces', () => {
        with whitespace`, () => {
       const query = {
         view: 'search_view',
-        collections: [ { name: 'coll', analyzer: 'text_en' } ],
+        collections: [{ name: 'coll', analyzer: 'text_en' }],
         terms: '  " complex    phrase "  ',
+        key: ['text'],
       }
       const builtSearch = buildSearch(query)
 
@@ -29,8 +30,9 @@ describe('whitespaces', () => {
      with whitespaces`, () => {
       const query = {
         view: 'search_view',
-        collections: [ { name: 'coll', analyzer: 'text_en' } ],
+        collections: [{ name: 'coll', analyzer: 'text_en' }],
         terms: '  -a   +"query    string " ?token   ',
+        key: ['text'],
       }
       const builtSearch = buildSearch(query)
 
@@ -41,7 +43,7 @@ describe('whitespaces', () => {
       expect(builtSearch.bindVars.value4).to.deep.equal(1)
       expect(builtSearch.bindVars.value5).to.deep.equal('a')
       expect(builtSearch.bindVars.value6).to.deep.equal({
-        collections: [ query.collections[ 0 ].name ],
+        collections: [query.collections[0].name],
       })
       expect(builtSearch.query).to.equal(`
   SEARCH 
@@ -74,6 +76,7 @@ describe('whitespaces', () => {
           },
         ],
         terms: '   +mandatory  -exclude     ?" optional  phrase "',
+        key: ['text'],
       }
       const builtSearch = buildSearch(query)
       expect(builtSearch.query).to.equal(`
@@ -111,6 +114,7 @@ describe('whitespaces', () => {
           },
         ],
         terms: '  -"  exclude  "',
+        key: ['text'],
       }
       const builtSearch = buildSearch(query)
       expect(builtSearch.query).to.equal(`
@@ -136,6 +140,7 @@ describe('whitespaces', () => {
           },
         ],
         terms: '   -exclude   ',
+        key: ['text'],
       }
       const builtSearch = buildSearch(query)
       expect(builtSearch.bindVars.value0).to.equal('exclude')
