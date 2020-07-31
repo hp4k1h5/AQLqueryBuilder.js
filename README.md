@@ -1,24 +1,25 @@
 # AQLqueryBuilder.js
 > a typescript query builder for [arangodb](https://www.arangodb.com)'s [ArangoSearch](https://www.arangodb.com/docs/stable/arangosearch.html)
-See working demo at [hp4k1h5.github.io](https://hp4k1h5.github.io/#search-box).  
 
-**!Note** AQLqueryBuilder.js does NOT contain any code for the search bar, only the
+See working demo at [hp4k1h5.github.io](https://hp4k1h5.github.io/#search-box). **!Note** AQLqueryBuilder.js does NOT contain any code for the search bar, only the
 query string parser and AQL builder. Unabstracted code for the searchbar is
-located
-[here](https://github.com/HP4k1h5/hp4k1h5.github.io/tree/main/demos/src/components/search).
+located [here](https://github.com/HP4k1h5/hp4k1h5.github.io/tree/main/demos/src/components/search).
+
 ![search bar demonstration with schematic query
 interface](./img/searchbar_demo.png)
 
-- [ overview ](#overview)
-- [ setup](#setup)
-  - [ installation](#installation)
-- [ usage](#usage)
-  - [ query object](#query-object)
-  - [ boolean search logic](#boolean-search-logic)
-  - [ default query syntax](#default-query-syntax)
-  - [ Example](#Example)
-- [ bugs](#bugs)
-- [ contributing](#contributing)
+* [overview](#overview)
+* [setup](#setup)
+* [installation](#installation)
+* [usage](#usage)
+  * [`buildAQL()`](#buildaql())
+    * [query](#query)
+    * [`query` Example](#query-example)
+  * [boolean search logic](#boolean-search-logic)
+  * [default query syntax](#default-query-syntax)
+    * [Example](#example)
+* [bugs](#bugs)
+* [contributing](#contributing)
 
 ## overview
 
@@ -148,7 +149,9 @@ const queryObject = {
   "query": "+'query string' -for +parseQuery ?to parse"
 }
 
-const aqlQuery = buildAQL(queryObject)
+const limit = {start:1, end: 20}
+
+const aqlQuery = buildAQL(queryObject, limit)
 
 // ... const cursor = await db.query(aqlQuery)
 // ... const cursor = await db.query(buildAQL(queryObject, {start:21, end:40})
@@ -157,24 +160,64 @@ const aqlQuery = buildAQL(queryObject)
 Generate documenation with `yarn doc && serve docs/` or see more examples in
 e.g. [tests/search.ts](tests/search.ts)
 
-### query object
+___
 
-`buildAQL` accepts an object with the following properties:
+### `buildAQL()`
 
+`buildAQL` accepts two parameters: `query` and `limit`
+
+#### query
 • **view**: *string* (required): the name of the ArangoSearch view the query
 will be run against
 
-• **collections** (required): the names of the collections indexed by @view to query
+• **collections** (required): an array of objects of the indexed collections
+to query. Objects have the following shape:
+```json
+{
+  "name": "collection-name",
+  "analyzer": "analyzer_name"
+}
+```
 
-• **terms** (required): either an array of `term` interfaces or a string to be
-parsed by `parseQuery`
+• **query** (required): either an array of `term` interfaces or a query string
+to be parsed by `parseQuery`.
+- **term** (optional): a JSON object representing the search.
+  - **val** *string* (required): a search term or phrase. For PHRASE
+  searches, include one "quoted phrase" per val. For TOKENS you may combine
+  multiple terms under a single analyzer or use one `term` per token.
+  - **op** *string* (required): boolean operator; **one of `+ ? -`,**
+  representing `AND OR NOT` respectively
+  - **type** *string* (required): **one of `"phr"`** for PHRASES **or `"tok"`**
+  for TOKENS.  
 
-• **key** (optional | default: "text"): the name of the Arango document key to search
-within.
+• **key** (optional | default: "text"): the name of the Arango document key to
+search within.
 
-• **filters** (optional): a list of @filter interfaces
+• **filters** (optional): a list of filter interfaces. See [arango FILTER
+operations](https://www.arangodb.com/docs/stable/aql/operations-filter.html)
+for more details. All [Arango
+operators](https://www.arangodb.com/docs/3.6/aql/operators.html ) Filters have
+the following shape:
+```json
+{
+  "field": "the name of the field, i.e. Arango document key to filter on",
+  "op": "one of: == != < > <= >= IN NOT IN LIKE NOT LIKE =~ !~     ",
+  "val": "the "
+}
+```
 
-___
+#### limit
+an object with the following keys:
+- `start` (integer), 1-based result pagination lower bound.
+- `end` (integer) 1-based result pagination upper bound
+i.e. to bring back up to the first 20 results
+```json
+{start:1, end:20}
+```
+and the next page would be
+```json
+{start:21, end:40}
+```
 
 #### `query` Example
 ```json
@@ -182,16 +225,17 @@ ___
   "view": "the_arango-search_view-name",
   "collections": [
     {
-      "name":
-      "collection_name", "analyzer":
-       "analyzer_name"
+      "name":"collection_name",
+      "analyzer": "analyzer_name"
     }
   ],
   "key": "text",
   "query": "either a +query ?\"string for parseQuery to parse\"",
   "query": [
            {"type": "phr", "op": "?", "val": "\"!!! OR a list of query objects\""},
-           {"type": "tok", "op": "-", "val": "tokens"}
+           {"type": "phr", "op": "?", "val": "optional phrases"},
+           {"type": "tok", "op": "-", "val": "excluded tokens"},
+           {"type": "tok", "op": "+", "val": "mandatory tokens"}
          ],
   "filters": [
     {
@@ -203,6 +247,24 @@ ___
 }
 ```
 
+___
+
+#### `limit` object 
+the second parameter passed to `buildAQL(query, limit)`
+
+optional, default `{start:1, end: 20}`, **start** (optional | default: 1): the
+1-based inclusive starting index of the result set to return.
+
+**end** (optional: default: 20): the 1-based inclusive ending index of the
+result set to result
+
+#### `limit` Example
+```json
+{
+  "start": 21,
+  "end": 40
+}
+```
 
 ___
 ### boolean search logic
@@ -289,5 +351,4 @@ ___
 please see [bugs](https://github.com/HP4k1h5/AQLqueryBuilder.js/issues/new?assignees=HP4k1h5&labels=bug&template=bug_report.md&title=basic)
 
 ## contributing
-please see [./.github/CONTRIBUTING.md]
-
+please see [CONTRIBUTING](./.github/CONTRIBUTING.md)
