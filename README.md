@@ -151,12 +151,12 @@ const queryObject = {
   "query": "+'query string' -for +parseQuery ?to parse"
 }
 
-const limit = {start:1, end: 20}
+const limit = {start:0, count: 20}
 
 const aqlQuery = buildAQL(queryObject, limit)
 
 // ... const cursor = await db.query(aqlQuery)
-// ... const cursor = await db.query(buildAQL(queryObject, {start:21, end:40})
+// ... const cursor = await db.query(buildAQL(queryObject, {start:20, count:20})
 ```
 
 Generate documenation with `yarn doc && serve docs/` or see more examples in
@@ -210,18 +210,18 @@ the following shape:
 
 #### limit
 an object with the following keys:
-- `start` (integer), 1-based result pagination lower bound.
-- `end` (integer) 1-based result pagination upper bound
-i.e. to bring back up to the first 20 results
+- `start` (integer) 0-based result pagination lower bound.
+- `count` (integer) total number of results to return.
+i.e. to bring back up to the first 10 results
 ```json
-{start:1, end:20}
+{"start":0, "count":10}
 ```
 and the next page would be
 ```json
-{start:21, end:40}
+{"start":10, "count":10}
 ```
 
-#### `query` Example
+#### `query` example
 ```json
 {
   "view": "the_arango-search_view-name",
@@ -251,22 +251,10 @@ and the next page would be
 
 ___
 
-#### `limit` object 
-the second parameter passed to `buildAQL(query, limit)`
-
-optional, default `{start:1, end: 20}`, **start** (optional | default: 1): the
-1-based inclusive starting index of the result set to return.
 
 **end** (optional: default: 20): the 1-based inclusive ending index of the
 result set to result
 
-#### `limit` Example
-```json
-{
-  "start": 21,
-  "end": 40
-}
-```
 
 ___
 ### boolean search logic

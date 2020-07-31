@@ -16,10 +16,9 @@ export interface query {
    * */
   terms: term[] | string
   /**
-   * the name of the document key to search, currently must be the same across
-   * all documents. @default "text"
+   * the name(s) of the document key to search. @default "text"
    * */
-  key?: string
+  key?: string[] | string
   /**
    * a list of @filter interfaces. All filters are implicitly AND'ed together.
    * */
