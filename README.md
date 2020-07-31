@@ -88,7 +88,8 @@ also accommodate multiple key searches.
 ___
 ## setup
 
-1) running generated AQL queries will require a running arangodb instance.
+1) running generated AQL queries will require a running ArangoDB v3.6+
+instance. This package is tested against v3.6.5 🥑
 
 ## installation
 currently there is only support for server-side use.
@@ -97,7 +98,8 @@ currently there is only support for server-side use.
     or `npm install --save @hp4k1h5/AQLqueryBuilder.js`  
     in a directory containing a `package.json` file.  
    __or__  
-  clone this repository in your node compatible project.
+  clone this repository in your node compatible project. And run `yarn` from
+  inside the directory.
 
 2) import/require the exported functions
 ```js

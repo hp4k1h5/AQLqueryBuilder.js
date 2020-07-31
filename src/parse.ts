@@ -6,15 +6,15 @@ export function parseQuery(queryString: string): term[] {
   let matches = queryString.match(queryRgx)
   if (!matches) return []
 
-  return matches.map(match => {
+  return matches.map((match) => {
     /* strip op */
     let op = '?'
-    if (/[+?-]/.test(match[ 0 ])) {
-      op = match[ 0 ]
+    if (/[+?-]/.test(match[0])) {
+      op = match[0]
       match = match.substring(1)
     }
 
-    if (match[ 0 ] == '"' || match[ 0 ] == "'") {
+    if (match[0] == '"' || match[0] == "'") {
       return {
         type: 'phr',
         val: match,

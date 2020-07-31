@@ -8,9 +8,9 @@ export function buildSearch(query: query): any {
     typeof query.terms == 'string' ? parseQuery(query.terms) : query.terms
 
   /* build boolean pieces */
-  let ANDS = buildOPS(query.collections, query.terms, '+', query.key)
-  let ORS = buildOPS(query.collections, query.terms, '?', query.key)
-  let NOTS = buildOPS(query.collections, query.terms, '-', query.key)
+  let ANDS = buildOps(query.collections, query.terms, '+', query.key)
+  let ORS = buildOps(query.collections, query.terms, '?', query.key)
+  let NOTS = buildOps(query.collections, query.terms, '-', query.key)
 
   /* handle combinations */
   if (ANDS && ORS) {
@@ -22,7 +22,7 @@ export function buildSearch(query: query): any {
     ${NOTS.phrases ? aql.literal(' NOT ') : undefined} ${NOTS.phrases}
     ${NOTS.phrases && NOTS.tokens ? aql.literal(' AND ') : undefined} ${
       NOTS.tokens
-      }`
+    }`
   }
 
   /* if an empty query.terms string or array is passed, SEARCH true, bringing
@@ -37,11 +37,11 @@ export function buildSearch(query: query): any {
       SORT TFIDF(doc) DESC`
 }
 
-function buildOPS(
+function buildOps(
   collections: collection[],
   terms: term[],
   op: string,
-  key: string = 'text',
+  key: string[] | string = 'text',
 ): any {
   const opWord: string = op == '+' ? ' AND ' : ' OR '
 
@@ -56,16 +56,16 @@ function buildOPS(
   let tokens = queryTerms.filter((qT: { type: string }) => qT.type === 'tok')
   tokens = tokens && buildTokens(tokens, collections, key)
 
-  if (!phrases && !tokens) return
+  /* if (!phrases && !tokens) return */
   if (op == '-') return { phrases, tokens }
-  if (phrases && tokens) return aql.join([ phrases, tokens ], opWord)
+  if (phrases && tokens) return aql.join([phrases, tokens], opWord)
   return tokens || phrases
 }
 
 function buildPhrases(
   phrases: term[],
   collections: collection[],
-  key: string,
+  key: string[] | string,
   opWord: string,
 ): any {
   if (!phrases.length) return undefined
@@ -79,7 +79,7 @@ function buildPhrases(
 function buildPhrase(
   phrase: term,
   collections: collection[],
-  key: string,
+  key: string[] | string,
 ): any {
   const phrases = collections.map((coll) => {
     return aql`PHRASE(doc.${key}, ${phrase.val.slice(1, -1)}, ${coll.analyzer})`
@@ -90,7 +90,7 @@ function buildPhrase(
 function buildTokens(
   tokens: term[],
   collections: collection[],
-  key: string,
+  key: string[] | string,
 ): any {
   if (!tokens.length) return
 
@@ -101,8 +101,8 @@ function buildTokens(
   }
 
   const mapped = tokens.reduce((a, v) => {
-    const op = a[ opWordMap[ v.op ] ]
-    a[ opWordMap[ v.op ] ] = op ? op + ' ' + v.val : v.val
+    const op = a[opWordMap[v.op]]
+    a[opWordMap[v.op]] = op ? op + ' ' + v.val : v.val
     return a
   }, {})
 
@@ -110,7 +110,7 @@ function buildTokens(
     tokens: term[],
     op: string,
     analyzer: string,
-    key: string,
+    key: string[] | string,
   ) => {
     return aql`
       ANALYZER(
@@ -122,11 +122,11 @@ function buildTokens(
   collections.forEach((coll) => {
     remapped.push(
       ...Object.keys(mapped).map((op) =>
-        makeTokenAnalyzers(mapped[ op ], op, coll.analyzer, key),
+        makeTokenAnalyzers(mapped[op], op, coll.analyzer, key),
       ),
     )
   })
 
   return aql`MIN_MATCH(${aql.join(remapped, ', ')}, 
-    ${tokens[ 0 ].op === '-' ? collections.length : 1})`
+    ${tokens[0].op === '-' ? collections.length : 1})`
 }
