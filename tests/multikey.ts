@@ -1,7 +1,7 @@
 import { expect } from 'chai'
 import { buildSearch } from '../src/search'
 
-describe('search.ts', () => {
+describe('multi-key search.ts', () => {
   it('should export a function named buildSearch', () => {
     expect(buildSearch).to.be.a('function')
   })
@@ -36,21 +36,22 @@ describe('search.ts', () => {
     const query = {
       view: 'search_view',
       collections: [
-        {
-          name: 'coll',
-          analyzer: 'text_en',
-          keys: ['text'],
-        },
+        { name: 'coll', analyzer: 'text_en', keys: ['text_en'] },
+        { name: 'coll', analyzer: 'text_es', keys: ['text_es'] },
       ],
       terms: '"complex phrase"',
-      /* key: ['text'], */
     }
     const builtSearch = buildSearch(query)
 
+    expect(Object.keys(builtSearch.bindVars)).to.have.length(4)
+    expect(builtSearch.bindVars.value0).to.equal('text_en')
+    expect(builtSearch.bindVars.value1).to.equal('complex phrase')
+    expect(builtSearch.bindVars.value2).to.equal('text_es')
+    expect(builtSearch.bindVars.value3).to.be.a('object')
     expect(builtSearch.query).to.equal(`
   SEARCH 
      
-    (PHRASE(doc.@value0, @value1, @value2))
+    (PHRASE(doc.@value0, @value1, @value0) OR PHRASE(doc.@value2, @value1, @value2))
     
     
     OPTIONS @value3
@@ -62,43 +63,47 @@ describe('search.ts', () => {
     const query = {
       view: 'search_view',
       collections: [
-        {
-          name: 'coll',
-          analyzer: 'text_en',
-          keys: ['text'],
-        },
+        { name: 'coll', analyzer: 'text_en', keys: ['text_en'] },
+        { name: 'coll', analyzer: 'text_es', keys: ['text_es'] },
       ],
       terms: '-a +"query string" ?token',
-      key: ['text'],
     }
     const builtSearch = buildSearch(query)
 
-    expect(Object.keys(builtSearch.bindVars)).to.have.length(7)
-    expect(builtSearch.bindVars.value0).to.deep.equal('text')
-    expect(builtSearch.bindVars.value1).to.deep.equal('query string')
-    expect(builtSearch.bindVars.value2).to.deep.equal('text_en')
-    expect(builtSearch.bindVars.value4).to.deep.equal(1)
-    expect(builtSearch.bindVars.value5).to.deep.equal('a')
-    expect(builtSearch.bindVars.value6).to.deep.equal({
-      collections: [query.collections[0].name],
+    expect(Object.keys(builtSearch.bindVars)).to.have.length(8)
+    expect(builtSearch.bindVars.value0).to.equal('text_en')
+    expect(builtSearch.bindVars.value1).to.equal('query string')
+    expect(builtSearch.bindVars.value2).to.equal('text_es')
+    expect(builtSearch.bindVars.value3).to.equal('token')
+    expect(builtSearch.bindVars.value4).to.equal(1)
+    expect(builtSearch.bindVars.value5).to.equal('a')
+    expect(builtSearch.bindVars.value6).to.equal(2)
+    expect(builtSearch.bindVars.value7).to.deep.equal({
+      collections: query.collections.map((c) => c.name),
     })
     expect(builtSearch.query).to.equal(`
   SEARCH 
-    (PHRASE(doc.@value0, @value1, @value2)) OR ((PHRASE(doc.@value0, @value1, @value2)) AND MIN_MATCH(
+    (PHRASE(doc.@value0, @value1, @value0) OR PHRASE(doc.@value2, @value1, @value2)) OR ((PHRASE(doc.@value0, @value1, @value0) OR PHRASE(doc.@value2, @value1, @value2)) AND MIN_MATCH(
+      ANALYZER(
+        TOKENS(@value3, @value0)
+        ANY IN doc.@value0, @value0), 
       ANALYZER(
         TOKENS(@value3, @value2)
-        ANY IN doc.@value0, @value2), 
+        ANY IN doc.@value2, @value2), 
     @value4)) 
     
      AND  
      
      MIN_MATCH(
       ANALYZER(
+        TOKENS(@value5, @value0)
+        NONE IN doc.@value0, @value0), 
+      ANALYZER(
         TOKENS(@value5, @value2)
-        NONE IN doc.@value0, @value2), 
-    @value4)
+        NONE IN doc.@value2, @value2), 
+    @value6)
     
-    OPTIONS @value6
+    OPTIONS @value7
       SORT TFIDF(doc) DESC`)
   })
 
@@ -106,14 +111,10 @@ describe('search.ts', () => {
     const query = {
       view: 'search_view',
       collections: [
-        {
-          name: 'coll',
-          analyzer: 'text_en',
-          keys: ['text'],
-        },
+        { name: 'coll', analyzer: 'text_en', keys: ['text_en'] },
+        { name: 'coll', analyzer: 'text_es', keys: ['text_es'] },
       ],
       terms: '+mandatory -exclude ?"optional phrase"',
-      key: ['text'],
     }
     const builtSearch = buildSearch(query)
     expect(builtSearch.query).to.equal(`
@@ -121,22 +122,31 @@ describe('search.ts', () => {
     MIN_MATCH(
       ANALYZER(
         TOKENS(@value0, @value1)
-        ALL IN doc.@value2, @value1), 
+        ALL IN doc.@value1, @value1), 
+      ANALYZER(
+        TOKENS(@value0, @value2)
+        ALL IN doc.@value2, @value2), 
     @value3) OR (MIN_MATCH(
       ANALYZER(
         TOKENS(@value0, @value1)
-        ALL IN doc.@value2, @value1), 
-    @value3) AND (PHRASE(doc.@value2, @value4, @value1))) 
+        ALL IN doc.@value1, @value1), 
+      ANALYZER(
+        TOKENS(@value0, @value2)
+        ALL IN doc.@value2, @value2), 
+    @value3) AND (PHRASE(doc.@value1, @value4, @value1) OR PHRASE(doc.@value2, @value4, @value2))) 
     
      AND  
      
      MIN_MATCH(
       ANALYZER(
         TOKENS(@value5, @value1)
-        NONE IN doc.@value2, @value1), 
-    @value3)
+        NONE IN doc.@value1, @value1), 
+      ANALYZER(
+        TOKENS(@value5, @value2)
+        NONE IN doc.@value2, @value2), 
+    @value6)
     
-    OPTIONS @value6
+    OPTIONS @value7
       SORT TFIDF(doc) DESC`)
   })
 
@@ -144,14 +154,11 @@ describe('search.ts', () => {
     const query = {
       view: 'search_view',
       collections: [
-        {
-          name: 'coll',
-          analyzer: 'text_en',
-          keys: ['text'],
-        },
+        { name: 'coll', analyzer: 'text_en', keys: ['text_en'] },
+        { name: 'coll', analyzer: 'text_es', keys: ['text_es'] },
       ],
       terms: '-"exclude"',
-      key: ['text'],
+      key: ['text', 'text_nl'],
     }
     const builtSearch = buildSearch(query)
     expect(builtSearch.query).to.equal(`
@@ -159,7 +166,7 @@ describe('search.ts', () => {
      
     
      
-     NOT  (PHRASE(doc.@value0, @value1, @value2))
+     NOT  (PHRASE(doc.@value0, @value1, @value0) OR PHRASE(doc.@value2, @value1, @value2))
      
     
     OPTIONS @value3
@@ -170,20 +177,20 @@ describe('search.ts', () => {
     const query = {
       view: 'search_view',
       collections: [
-        {
-          name: 'coll',
-          analyzer: 'text_en',
-          keys: ['text'],
-        },
+        { name: 'coll', analyzer: 'text_en', keys: ['text_en'] },
+        { name: 'coll', analyzer: 'text_es', keys: ['text_es'] },
       ],
       terms: '-exclude',
-      key: ['text'],
+      key: ['text', 'text_pt'],
     }
     const builtSearch = buildSearch(query)
     expect(builtSearch.bindVars.value0).to.equal('exclude')
     expect(builtSearch.bindVars.value1).to.equal('text_en')
-    expect(builtSearch.bindVars.value2).to.equal('text')
-    expect(builtSearch.bindVars.value3).to.equal(1)
+    expect(builtSearch.bindVars.value2).to.equal('text_es')
+    expect(builtSearch.bindVars.value3).to.equal(2)
+    expect(builtSearch.bindVars.value4).to.deep.equal({
+      collections: ['coll', 'coll'],
+    })
     expect(builtSearch.query).to.equal(`
   SEARCH 
      
@@ -193,7 +200,10 @@ describe('search.ts', () => {
      MIN_MATCH(
       ANALYZER(
         TOKENS(@value0, @value1)
-        NONE IN doc.@value2, @value1), 
+        NONE IN doc.@value1, @value1), 
+      ANALYZER(
+        TOKENS(@value0, @value2)
+        NONE IN doc.@value2, @value2), 
     @value3)
     
     OPTIONS @value4

@@ -8,9 +8,9 @@ export function buildSearch(query: query): any {
     typeof query.terms == 'string' ? parseQuery(query.terms) : query.terms
 
   /* build boolean pieces */
-  let ANDS = buildOPS(query.collections, query.terms, '+', query.key)
-  let ORS = buildOPS(query.collections, query.terms, '?', query.key)
-  let NOTS = buildOPS(query.collections, query.terms, '-', query.key)
+  let ANDS = buildOps(query.collections, query.terms, '+')
+  let ORS = buildOps(query.collections, query.terms, '?')
+  let NOTS = buildOps(query.collections, query.terms, '-')
 
   /* handle combinations */
   if (ANDS && ORS) {
@@ -22,7 +22,7 @@ export function buildSearch(query: query): any {
     ${NOTS.phrases ? aql.literal(' NOT ') : undefined} ${NOTS.phrases}
     ${NOTS.phrases && NOTS.tokens ? aql.literal(' AND ') : undefined} ${
       NOTS.tokens
-      }`
+    }`
   }
 
   /* if an empty query.terms string or array is passed, SEARCH true, bringing
@@ -37,12 +37,7 @@ export function buildSearch(query: query): any {
       SORT TFIDF(doc) DESC`
 }
 
-function buildOPS(
-  collections: collection[],
-  terms: term[],
-  op: string,
-  key: string = 'text',
-): any {
+function buildOps(collections: collection[], terms: term[], op: string): any {
   const opWord: string = op == '+' ? ' AND ' : ' OR '
 
   let queryTerms: any = terms.filter((t: term) => t.op == op)
@@ -50,48 +45,44 @@ function buildOPS(
 
   /* phrases */
   let phrases = queryTerms.filter((qT: term) => qT.type == 'phr')
-  phrases = buildPhrases(phrases, collections, key, opWord)
+  phrases = buildPhrases(phrases, collections, opWord)
 
   /* tokens */
   let tokens = queryTerms.filter((qT: { type: string }) => qT.type === 'tok')
-  tokens = tokens && buildTokens(tokens, collections, key)
+  tokens = tokens && buildTokens(tokens, collections)
 
-  if (!phrases && !tokens) return
+  /* if (!phrases && !tokens) return */
   if (op == '-') return { phrases, tokens }
-  if (phrases && tokens) return aql.join([ phrases, tokens ], opWord)
+  if (phrases && tokens) return aql.join([phrases, tokens], opWord)
   return tokens || phrases
 }
 
 function buildPhrases(
   phrases: term[],
   collections: collection[],
-  key: string,
   opWord: string,
 ): any {
   if (!phrases.length) return undefined
 
   return aql.join(
-    phrases.map((phrase: any) => buildPhrase(phrase, collections, key)),
+    phrases.map((phrase: any) => buildPhrase(phrase, collections)),
     opWord,
   )
 }
 
-function buildPhrase(
-  phrase: term,
-  collections: collection[],
-  key: string,
-): any {
-  const phrases = collections.map((coll) => {
-    return aql`PHRASE(doc.${key}, ${phrase.val.slice(1, -1)}, ${coll.analyzer})`
-  })
+function buildPhrase(phrase: term, collections: collection[]): any {
+  const phrases = []
+  collections.forEach((coll) =>
+    coll.keys.forEach((k: string) =>
+      phrases.push(
+        aql`PHRASE(doc.${k}, ${phrase.val.slice(1, -1)}, ${coll.analyzer})`,
+      ),
+    ),
+  )
   return aql`(${aql.join(phrases, ' OR ')})`
 }
 
-function buildTokens(
-  tokens: term[],
-  collections: collection[],
-  key: string,
-): any {
+function buildTokens(tokens: term[], collections: collection[]): any {
   if (!tokens.length) return
 
   const opWordMap = {
@@ -101,8 +92,8 @@ function buildTokens(
   }
 
   const mapped = tokens.reduce((a, v) => {
-    const op = a[ opWordMap[ v.op ] ]
-    a[ opWordMap[ v.op ] ] = op ? op + ' ' + v.val : v.val
+    const op = a[opWordMap[v.op]]
+    a[opWordMap[v.op]] = op ? op + ' ' + v.val : v.val
     return a
   }, {})
 
@@ -110,23 +101,28 @@ function buildTokens(
     tokens: term[],
     op: string,
     analyzer: string,
-    key: string,
+    keys: string[],
   ) => {
-    return aql`
+    return aql.join(
+      keys.map(
+        (k) => aql`
       ANALYZER(
         TOKENS(${tokens}, ${analyzer})
-        ${aql.literal(op)} IN doc.${key}, ${analyzer})`
+        ${aql.literal(op)} IN doc.${k}, ${analyzer})`,
+      ),
+      ' OR ',
+    )
   }
 
   let remapped = []
-  collections.forEach((coll) => {
+  collections.forEach((col) => {
     remapped.push(
       ...Object.keys(mapped).map((op) =>
-        makeTokenAnalyzers(mapped[ op ], op, coll.analyzer, key),
+        makeTokenAnalyzers(mapped[op], op, col.analyzer, col.keys),
       ),
     )
   })
 
   return aql`MIN_MATCH(${aql.join(remapped, ', ')}, 
-    ${tokens[ 0 ].op === '-' ? collections.length : 1})`
+    ${tokens[0].op === '-' ? collections.length : 1})`
 }
