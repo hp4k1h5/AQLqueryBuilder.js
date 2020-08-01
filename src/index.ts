@@ -18,9 +18,7 @@ export function buildAQL(
   limit: any = { start: 0, count: 20 },
 ): any {
   validateQuery(query)
-  /* unify query.key */
-  query.key = query.key ? query.key : ['text']
-  query.key = typeof query.key == 'string' ? [query.key] : query.key
+  collectKeys(query)
 
   const SEARCH = buildSearch(query)
   const FILTER = query.filters && buildFilters(query.filters)
@@ -39,4 +37,19 @@ function validateQuery(query: query) {
     throw new Error('query.view must be a valid ArangoSearch View name')
   if (!query.collections.length)
     throw new Error('query.collections must have at least one name')
+}
+
+function collectKeys(query: query) {
+  /* unify query.key */
+  let _keys: string[]
+  if (typeof query.key == 'string') {
+    _keys = [query.key]
+  } else if (!query.key) {
+    _keys = ['text']
+  } else _keys = query.key
+
+  query.collections = query.collections.map((c) => {
+    if (!c.keys) c.keys = _keys
+    return c
+  })
 }

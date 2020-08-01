@@ -5,7 +5,11 @@ import { buildAQL } from '../src/index'
 describe('buildAQL', () => {
   it(`should return an aql object
      when an empty string is passed for query terms`, () => {
-    let query = { view: 'view', collections: [ { name: 'coll', analyzer: 'analyzer' } ], terms: '' }
+    let query = {
+      view: 'view',
+      collections: [{ name: 'coll', analyzer: 'analyzer' }],
+      terms: '',
+    }
     const builtAQL = buildAQL(query)
     expect(builtAQL).to.be.an('object')
 
@@ -21,13 +25,16 @@ describe('buildAQL', () => {
       SORT TFIDF(doc) DESC
       
       LIMIT @value2, @value3
-    RETURN doc`
-    )
+    RETURN doc`)
   })
 
   it(`should return an aql object
      when an empty array is passed for query terms`, () => {
-    let query = { view: 'view', collections: [ { name: 'coll', analyzer: 'analyzer' } ], terms: [] }
+    let query = {
+      view: 'view',
+      collections: [{ name: 'coll', analyzer: 'analyzer' }],
+      terms: [],
+    }
     const builtAQL = buildAQL(query)
     expect(builtAQL).to.be.an('object')
 
@@ -43,13 +50,16 @@ describe('buildAQL', () => {
       SORT TFIDF(doc) DESC
       
       LIMIT @value2, @value3
-    RETURN doc`
-    )
+    RETURN doc`)
   })
 
   it(`should return an aql object
      when a phrase string is passed for query terms`, () => {
-    let query = { view: 'view', collections: [ { name: 'coll', analyzer: 'analyzer' } ], terms: '"phrase search"' }
+    let query = {
+      view: 'view',
+      collections: [{ name: 'coll', analyzer: 'analyzer' }],
+      terms: '"phrase search"',
+    }
     const builtAQL = buildAQL(query)
     expect(builtAQL).to.be.an('object')
 
@@ -69,7 +79,11 @@ describe('buildAQL', () => {
   })
 
   it(`should handle basic boolean cases`, () => {
-    let query = { view: 'view', collections: [ { name: 'coll', analyzer: 'analyzer' } ], terms: '-"hope"' }
+    let query = {
+      view: 'view',
+      collections: [{ name: 'coll', analyzer: 'analyzer' }],
+      terms: '-"hope"',
+    }
 
     const builtAQL = buildAQL(query)
     expect(builtAQL).to.be.an('object')
@@ -91,7 +105,11 @@ describe('buildAQL', () => {
   })
 
   it(`should handle basic boolean cases`, () => {
-    let query = { view: 'view', collections: [ { name: 'coll', analyzer: 'analyzer' } ], terms: '-hope' }
+    let query = {
+      view: 'view',
+      collections: [{ name: 'coll', analyzer: 'analyzer' }],
+      terms: '-hope',
+    }
 
     const builtAQL = buildAQL(query)
     expect(builtAQL).to.be.an('object')

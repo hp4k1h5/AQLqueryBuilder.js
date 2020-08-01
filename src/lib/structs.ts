@@ -8,7 +8,8 @@ export interface query {
    * */
   view: string
   /**
-   * the names of the collections indexed by @param view to query
+   * the names and analyzers  of the collections indexed by @param
+   * view to query
    * */
   collections: collection[]
   /**
@@ -31,6 +32,7 @@ export interface query {
  *
  * A collection can be referenced by several analyzers and each must have its
  * own entry in `query.collections` in order to be included in the search.
+ * Also, if query.key
  *
  * Alternatively, a document can be stored in several collections.
  *
@@ -38,14 +40,16 @@ export interface query {
  * specified.
  * */
 export interface collection {
-  /**
-   * the name of the collection
-   * */
+  /** the name of the collection */
   name: string
-  /**
-   * the name of the text analyzer
-   * */
+  /** the name of the text analyzer */
   analyzer: string
+  /*
+   * a list of key names that are indexed by the analyzer that you wish to
+   * query against. If none are provided, those provided in @param query.key
+   * will be used
+   * */
+  keys?: string[]
 }
 
 /**

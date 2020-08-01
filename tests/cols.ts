@@ -4,7 +4,7 @@ import { buildAQL } from '../src/index'
 
 describe('multiple collections', () => {
   it(`should return an aql object
-     when multiple collections are passed TOKEN`, () => {
+     when multiple collections are passed a TOKEN`, () => {
     let query = {
       view: 'view',
       collections: [
@@ -73,7 +73,7 @@ describe('multiple collections', () => {
      with multiple members and multiple collections is passed`, () => {
     let query = {
       view: 'view',
-      collections: [ { name: 'coll', analyzer: 'analyzer' } ],
+      collections: [{ name: 'coll', analyzer: 'analyzer' }],
       terms: 'other +words -nor +"phrase search" -"not these" ?"could have"',
     }
     const builtAQL = buildAQL(query)
@@ -109,27 +109,23 @@ describe('multiple collections', () => {
       SORT TFIDF(doc) DESC
       
       LIMIT @value10, @value11
-    RETURN doc`
-    )
+    RETURN doc`)
 
     expect(builtAQL.bindVars).to.deep.equal({
-      "value0": "text",
-      "value1": "phrase search",
-      "value10": 0,
-      "value11": 20,
-      "value2": "analyzer",
-      "value3": "words",
-      "value4": 1,
-      "value5": "could have",
-      "value6": "other",
-      "value7": "not these",
-      "value8": "nor",
-      "value9": {
-        "collections": [
-          "coll"
-        ]
-      }
+      value0: 'text',
+      value1: 'phrase search',
+      value10: 0,
+      value11: 20,
+      value2: 'analyzer',
+      value3: 'words',
+      value4: 1,
+      value5: 'could have',
+      value6: 'other',
+      value7: 'not these',
+      value8: 'nor',
+      value9: {
+        collections: ['coll'],
+      },
     })
   })
-
 })

@@ -27,7 +27,7 @@ describe('boolean search logic', () => {
     const links = {}
     links[collectionName] = {
       fields: {
-        text: { analyzers: ['text_en'] },
+        text_en: { analyzers: ['text_en'] },
         text_es: { analyzers: ['text_es'] },
       },
     }
@@ -45,7 +45,7 @@ describe('boolean search logic', () => {
     /* add documents */
     const docA = {
       title: 'doc A',
-      text: 'words in text in document',
+      text_en: 'words in text in document',
       text_es: 'palabras en texto en documento',
     }
     let insert: any = await db.query(
@@ -55,14 +55,14 @@ describe('boolean search logic', () => {
 
     const docB = {
       title: 'doc B',
-      text: 'sample word string to search across Alice Bob',
+      text_en: 'sample word string to search across Alice Bob',
       text_es: 'cadena de palabras de muestra para buscar Alice Bob',
     }
     insert = await db.query(aql`INSERT ${docB} INTO ${collection} RETURN NEW`)
     expect(insert._result[0].title).to.equal('doc B')
 
     const wait = (t: number) => new Promise((keep) => setTimeout(keep, t))
-    await wait(1400)
+    await wait(1600)
 
     const getAllInViewQuery = aql`
     FOR doc in ${aql.literal(info.name)}
@@ -100,9 +100,10 @@ describe('boolean search logic', () => {
           },
         ],
         terms: '',
-        key: ['text'],
+        key: ['text_en'],
       }
       let aqlQuery = buildAQL(query)
+      /* expect(aqlQuery.query).to.equal('') */
       let cursor = await db.query(aqlQuery)
       let has = cursor.hasNext()
       expect(has).to.be.ok
@@ -111,7 +112,7 @@ describe('boolean search logic', () => {
       expect(result).to.have.length(2)
 
       // pass multiple keys
-      query.key = ['text', 'text_es']
+      query.key = ['text_en', 'text_es']
       aqlQuery = buildAQL(query)
       cursor = await db.query(aqlQuery)
       has = cursor.hasNext()
@@ -133,19 +134,21 @@ describe('boolean search logic', () => {
           {
             name: collectionName,
             analyzer: 'text_en',
+            keys: ['text_en'],
           },
           {
             name: collectionName,
             analyzer: 'text_es',
+            keys: ['text_es'],
           },
         ],
         /* should match both results */
         terms: '+"word"',
-        key: ['text'],
+        key: [],
       }
 
       let aqlQuery = buildAQL(query)
-
+      /* expect(aqlQuery.query).to.equal('') */
       /* should match 2 documents */
       let cursor = await db.query(aqlQuery)
       expect(cursor.hasNext()).to.be.ok
@@ -155,7 +158,6 @@ describe('boolean search logic', () => {
       expect(cursor.hasNext()).to.not.be.ok
 
       /* spanish */
-      query.key = ['text_es']
       query.terms = '+"palabras"'
       aqlQuery = buildAQL(query)
 
@@ -168,9 +170,28 @@ describe('boolean search logic', () => {
       expect(cursor.hasNext()).to.not.be.ok
 
       /* english */
-      query.key = ['text_en']
+      query.key = ['text_en', 'text_es']
       query.terms = '+"in document"'
       aqlQuery = buildAQL(query)
+      expect(aqlQuery.bindVars.value0).to.equal('text_en')
+      expect(aqlQuery.bindVars.value1).to.equal('in document')
+      expect(aqlQuery.bindVars.value2).to.equal('text_es')
+      expect(aqlQuery.bindVars.value3).to.deep.equal({
+        collections: query.collections.map((c) => c.name),
+      })
+      expect(aqlQuery.query).to.equal(`
+    FOR doc IN ${view.name}
+      
+  SEARCH 
+    (PHRASE(doc.@value0, @value1, @value0) OR PHRASE(doc.@value2, @value1, @value2)) 
+    
+    
+    
+    OPTIONS @value3
+      SORT TFIDF(doc) DESC
+      
+      LIMIT @value4, @value5
+    RETURN doc`)
 
       /* should match 1 document */
       cursor = await db.query(aqlQuery)
@@ -203,18 +224,18 @@ describe('boolean search logic', () => {
       query.key = ['text', 'text_es']
       query.terms = '+"buscar"'
       let q = buildAQL(query)
-      expect(q.query).to.deep.equal(`
+      expect(q.query).to.equal(`
     FOR doc IN ${query.view}
       
   SEARCH 
-    (PHRASE(doc.@value0, @value1, @value2) OR PHRASE(doc.@value3, @value1, @value2)) 
+    (PHRASE(doc.@value0, @value1, @value0) OR PHRASE(doc.@value2, @value1, @value2)) 
     
     
     
-    OPTIONS @value4
+    OPTIONS @value3
       SORT TFIDF(doc) DESC
       
-      LIMIT @value5, @value6
+      LIMIT @value4, @value5
     RETURN doc`)
       cursor = await db.query(q)
       expect(cursor.hasNext()).to.be.ok
@@ -233,15 +254,17 @@ describe('boolean search logic', () => {
           {
             name: collectionName,
             analyzer: 'text_en',
+            keys: ['text_en'],
           },
           {
             name: collectionName,
             analyzer: 'text_es',
+            keys: ['text_es'],
           },
         ],
         /* should match both results */
         terms: '+word',
-        key: ['text'],
+        key: ['text_en'],
       }
 
       /* should bring back 2 document with default empty query string */
@@ -378,10 +401,12 @@ describe('boolean search logic', () => {
           {
             name: collectionName,
             analyzer: 'text_en',
+            keys: ['text_en'],
           },
           {
             name: collectionName,
             analyzer: 'text_es',
+            keys: ['text_es'],
           },
         ],
         /*  should bring back 1 result */
@@ -398,7 +423,7 @@ describe('boolean search logic', () => {
       expect(result[0].title).to.equal('doc A')
 
       /* should bring back 1 result */
-      query.terms = '"-cadena"'
+      query.terms = '-"cadena"'
       aqlQuery = buildAQL(query)
       cursor = await db.query(aqlQuery)
       expect(cursor.hasNext()).to.be.ok

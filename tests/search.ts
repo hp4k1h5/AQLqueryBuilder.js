@@ -35,9 +35,15 @@ describe('search.ts', () => {
   it(`should handle single phrase queries`, () => {
     const query = {
       view: 'search_view',
-      collections: [{ name: 'coll', analyzer: 'text_en' }],
+      collections: [
+        {
+          name: 'coll',
+          analyzer: 'text_en',
+          keys: ['text'],
+        },
+      ],
       terms: '"complex phrase"',
-      key: ['text'],
+      /* key: ['text'], */
     }
     const builtSearch = buildSearch(query)
 
@@ -55,7 +61,13 @@ describe('search.ts', () => {
      when a complex query is passed`, () => {
     const query = {
       view: 'search_view',
-      collections: [{ name: 'coll', analyzer: 'text_en' }],
+      collections: [
+        {
+          name: 'coll',
+          analyzer: 'text_en',
+          keys: ['text'],
+        },
+      ],
       terms: '-a +"query string" ?token',
       key: ['text'],
     }
@@ -97,6 +109,7 @@ describe('search.ts', () => {
         {
           name: 'coll',
           analyzer: 'text_en',
+          keys: ['text'],
         },
       ],
       terms: '+mandatory -exclude ?"optional phrase"',
@@ -134,6 +147,7 @@ describe('search.ts', () => {
         {
           name: 'coll',
           analyzer: 'text_en',
+          keys: ['text'],
         },
       ],
       terms: '-"exclude"',
@@ -159,6 +173,7 @@ describe('search.ts', () => {
         {
           name: 'coll',
           analyzer: 'text_en',
+          keys: ['text'],
         },
       ],
       terms: '-exclude',
