@@ -10,36 +10,42 @@ located [here](https://github.com/HP4k1h5/hp4k1h5.github.io/tree/main/demos/src/
 ![search bar demonstration with schematic query
 interface](./img/searchbar_demo.png)
 
-* [Patch Notes](#patch-notes)
-* [overview](#overview)
-* [setup](#setup)
-* [installation](#installation)
-* [usage](#usage)
-  * [`buildAQL()`](#buildaql())
-  * [boolean search logic](#boolean-search-logic)
-  * [default query syntax](#default-query-syntax)
-    * [Example](#example)
-* [bugs](#bugs)
-* [contributing](#contributing)
+- [Patch Notes](#patch-notes)
+- [overview](#overview)
+- [setup](#setup)
+- [installation](#installation)
+- [usage](#usage)
+  - [`buildAQL()`](#buildaql())
+  - [boolean search logic](#boolean-search-logic)
+  - [default query syntax](#default-query-syntax)
+    - [Example](#example)
+- [bugs](#bugs)
+- [contributing](#contributing)
 
 ## Patch Notes
+
 - v0.1.1
-  - ❌ Breaking change! `buildAQL()`'s `limit` parameter no longer accepts key
-    `end`, which has been renamed, per Arango spec, to `count`. The functionality
-    remains the same, which is why the patch bump. Please accept my apologies
-    for the un-semver approach. I have a personal philosophy that v0.X.X is
-    not really subject to the standard rules of semver, but I will do my best
-    to not present further breaking changes without upping at least the minor
-    version.
-  - multi-key search 🔑🗝
-      `query.key` now accepts in addition to a string value, an array of
-      strings over which the query is to be run. this can be useful if you
+  - ❌ Breaking change!  
+      `buildAQL()`'s `limit` parameter no longer accepts key
+      `end`, which has been renamed, per Arango spec, to `count`. The functionality
+      remains the same, which is why the patch bump. Please accept my apologies.
+  - 🔑🗝 multi-key search  
+      this can be useful if you
       have multiple fields with textual information. Theoretically, each
       chapter of a book could be stored on its own key. Or a document could
       have be translated into several languages, each stored on its own key.
-      ArangoSearch will handle the indexed fields by itself, provided the
-      collection and analyzer pair that indexes the key are provided to
-      `query.collections`
+      - **There are two ways to provide multiple keys to relevant functions.**
+      1) `query.key` now accepts in addition to a string value, an array of
+      strings over which the query is to be run. All keys listed here will be
+      run combined with all collections provided to `query.collections`
+      **unless** a collection has a `keys` property of its own, in which case
+      **only** those keys are searched against.
+      2) `query.collections[].keys` is an optional array of key names that are
+      indexed by `query.collections[].analyzer`. **Note** It is important that
+      any key listed in `query.collections[].keys` be indexed by the analyzer
+      as it will impact results if such a key does not exist.  
+
+
 
 ## overview
 
@@ -136,22 +142,15 @@ const {buildAQL} = require('@hp4k1h5/AQLqueryBuilder.js')
 __for up-to-date documentation, run `yarn doc && serve docs/` from the project
   directory root.__
 
-AQLqueryBuilder aims to provide cross-collection and cross-language boolean
-search capabilities to the library's user. Currently, this library makes a
-number of assumptions about the way your data is stored and indexed, but these
-are hopefully compatible with a wide range of setups.
+AQLqueryBuilder aims to provide cross-collection and cross-language, multi-key
+boolean search capabilities to the library's user.
 
-The primary assumption this library makes is that the data you are trying to
-query against is indexed by an ArangoSearch View, and that all documents index
-the same exact field. This field, passed to the builder as a key on the
-`query` object passed to e.g. `buildAQL()`, can be indexed by any number of
-analyzers, and the query will target all supplied collections simultaneously.
-This allows for true multi-language search, provided all analyzers and
-indexers index the same key as all other documents in the view. While there
-are plans to expand on this functionality to provide multi-key search, this
-library is primarily built for academic and textual searches, and is ideally
-suited for documents like books, articles, and other media where most of the
-data resides in a single place, i.e. document `key`, or `field`.
+Please ensure that the data you are trying to query against is indexed by an
+ArangoSearch View. The query will target all combinations of provided
+collections, analyzers and keys an simultaneously. This allows for granular
+multi-language search. This library is primarily built for academic and
+textual searches, and is ideally suited for documents like books, articles,
+and other text-heavy media.
 
 AQLqueryBuilder works best as a document query tool. Leveraging ArangoSearch's
 built-in language stemming analyzers allows for complex search phrases to be
@@ -166,7 +165,8 @@ const queryObject = {
   "view": "the_arango-search_view-name",
   "collections": [{
     "name": "collection_name",
-    "analyzer": "analyzer_name"
+    "analyzer": "analyzer_name",
+    "keys": ["text"]
   }],
   "query": "+'query string' -for +parseQuery ?to parse"
 }
@@ -197,9 +197,16 @@ to query. Objects have the following shape:
 ```json
 {
   "name": "collection-name",
-  "analyzer": "analyzer_name"
+  "analyzer": "analyzer_name",
+  "keys": ["text", "summary", "notes"]
 }
 ```
+`keys` are optional, though if key names are provided to `query.key`, and
+not all those keys are indexed by the collection, it is advisable to
+explicitly list only those keys on documents in that collection that are
+indexed by the analyzer. If a collection is indexed by multiple analyzers
+please list each collection-analyzer combination along with their relevant
+keys, unless a unified set of keys is provided to `query.key`.
 
 • **query** (required): either an array of `term` interfaces or a query string
 to be parsed by `parseQuery`.
@@ -231,8 +238,9 @@ the following shape:
 #### limit
 an object with the following keys:
 - `start` (integer) 0-based result pagination lower bound.
-- `count` (integer) total number of results to return.
-i.e. to bring back up to the first 10 results
+- `count` (integer) total number of results to return. ⚠ see CHANGELOG v0.1.1  
+
+to bring back up to the first 10 results
 ```json
 {"start":0, "count":10}
 ```
@@ -248,11 +256,16 @@ and the next page would be
   "collections": [
     {
       "name":"collection_name",
-      "analyzer": "analyzer_name"
+      "analyzer": "analyzer_name",
+      "keys": ["text", "summary", "notes"]
+    },
+    {
+      "name":"collection_es",
+      "analyzer": "analyzer_es",
+      "keys": ["texto", "resumen", "notas"]
     }
   ],
-  "key": "text",
-  "query": "either a +query ?\"string for parseQuery to parse\"",
+  "query": "either a +query ?\"string for parseQuery to parse\"    texto en español",
   "query": [
            {"type": "phr", "op": "?", "val": "\"!!! OR a list of query objects\""},
            {"type": "phr", "op": "?", "val": "optional phrases"},
@@ -270,17 +283,8 @@ and the next page would be
 ```
 
 ___
-
-
-**end** (optional: default: 20): the 1-based inclusive ending index of the
-result set to result
-
-
-___
 ### boolean search logic
-
 Quoting [mit's Database Search Tips](https://libguides.mit.edu/c.php?g=175963&p=1158594):
-
 > Boolean operators form the basis of mathematical sets and database logic.
     They connect your search words together to either narrow or broaden your
     set of results.  The three basic boolean operators are: AND, OR, and NOT.
