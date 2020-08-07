@@ -31,8 +31,9 @@ export interface query {
  * include in the query must be listed as a collection of the following shape.
  *
  * A collection can be referenced by several analyzers and each must have its
- * own entry in `query.collections` in order to be included in the search.
- * Also, if query.key
+ * own entry in `query.collections` in order to be included in the search. If
+ * a collection does not have a `keys` key, the search will be performed
+ * across ALL keys listed in `query.key`.
  *
  * Alternatively, a document can be stored in several collections.
  *
@@ -62,6 +63,8 @@ export interface collection {
  *  **types**  | PHRASE |  ✅  | ✅  |  ✅   |
  *             | TOKENS |  ✅  | ✅  |  ✅   |
  *             | PROXIM | TODO | TODO| TODO  |
+ *             | NGRAM  | TODO | TODO| TODO  |
+ *             | LEVENS | TODO | TODO| TODO  |
  * ```
  * */
 export interface term {
