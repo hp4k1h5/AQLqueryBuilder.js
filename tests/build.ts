@@ -21,7 +21,7 @@ describe('buildAQL', () => {
     
     
     @value0
-    OPTIONS @value1
+      OPTIONS { collections: @value1 }
       SORT TFIDF(doc) DESC
       
       LIMIT @value2, @value3
@@ -46,7 +46,7 @@ describe('buildAQL', () => {
     
     
     @value0
-    OPTIONS @value1
+      OPTIONS { collections: @value1 }
       SORT TFIDF(doc) DESC
       
       LIMIT @value2, @value3
@@ -71,7 +71,7 @@ describe('buildAQL', () => {
     (PHRASE(doc.@value0, @value1, @value2))
     
     
-    OPTIONS @value3
+      OPTIONS { collections: @value3 }
       SORT TFIDF(doc) DESC
       
       LIMIT @value4, @value5
@@ -97,7 +97,7 @@ describe('buildAQL', () => {
      NOT  (PHRASE(doc.@value0, @value1, @value2))
      
     
-    OPTIONS @value3
+      OPTIONS { collections: @value3 }
       SORT TFIDF(doc) DESC
       
       LIMIT @value4, @value5
@@ -127,7 +127,7 @@ describe('buildAQL', () => {
         NONE IN doc.@value2, @value1), 
     @value3)
     
-    OPTIONS @value4
+      OPTIONS { collections: @value4 }
       SORT TFIDF(doc) DESC
       
       LIMIT @value5, @value6

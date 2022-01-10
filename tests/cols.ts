@@ -31,7 +31,7 @@ describe('multiple collections', () => {
     @value4)
     
     
-    OPTIONS @value5
+      OPTIONS { collections: @value5 }
       SORT TFIDF(doc) DESC
       
       LIMIT @value6, @value7
@@ -61,7 +61,7 @@ describe('multiple collections', () => {
      NOT  (PHRASE(doc.@value0, @value1, @value2) OR PHRASE(doc.@value0, @value1, @value3))
      
     
-    OPTIONS @value4
+      OPTIONS { collections: @value4 }
       SORT TFIDF(doc) DESC
       
       LIMIT @value5, @value6
@@ -105,7 +105,7 @@ describe('multiple collections', () => {
         NONE IN doc.@value0, @value2), 
     @value4)
     
-    OPTIONS @value9
+      OPTIONS { collections: @value9 }
       SORT TFIDF(doc) DESC
       
       LIMIT @value10, @value11
@@ -123,9 +123,7 @@ describe('multiple collections', () => {
       value6: 'other',
       value7: 'not these',
       value8: 'nor',
-      value9: {
-        collections: ['coll'],
-      },
+      value9: ['coll'],
     })
   })
 })

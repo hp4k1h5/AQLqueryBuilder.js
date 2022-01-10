@@ -24,7 +24,7 @@ export function buildSearch(query: query): any {
       NOTS.tokens
     }`
   }
-
+  const cols = query.collections.map((c) => c.name)
   /* if an empty query.terms string or array is passed, SEARCH true, bringing
    * back all documents in view */
   return aql`
@@ -33,10 +33,9 @@ export function buildSearch(query: query): any {
     ${ORS}
     ${NOTS}
     ${(!ANDS && !ORS && !NOTS) || undefined}
-    OPTIONS ${{ collections: query.collections.map((c) => c.name) }}
+      OPTIONS { collections: ${cols} }
       SORT TFIDF(doc) DESC`
 }
-
 function buildOps(collections: collection[], terms: term[], op: string): any {
   const opWord: string = op == '+' ? ' AND ' : ' OR '
 

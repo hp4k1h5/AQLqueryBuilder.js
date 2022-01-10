@@ -1,5 +1,11 @@
 # CHANGELOG
 
+- v0.1.3
+  - updated dependencies
+    - arangojs: ~~v6.14.1~~ → 7.6.1
+  - updated compatabilities
+    - arangodb: ~~v3.6.5~~ → 3.8.4  
+
 - v0.1.2
   - 📓 Updated docs to properly reflect key names. Prior versions of this
       README were not up to date with the current functionality. Package

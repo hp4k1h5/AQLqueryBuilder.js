@@ -19,7 +19,7 @@ describe('search.ts', () => {
     expect(builtSearch).to.be.an('object')
     expect(Object.keys(builtSearch.bindVars)).to.have.length(2)
     expect(builtSearch.bindVars.value0).to.equal(true)
-    expect(builtSearch.bindVars.value1).to.deep.equal({ collections: ['coll'] })
+    expect(builtSearch.bindVars.value1).to.deep.equal(['coll'])
 
     /* empty array */
     let empty_array_query = {
@@ -53,7 +53,7 @@ describe('search.ts', () => {
     (PHRASE(doc.@value0, @value1, @value2))
     
     
-    OPTIONS @value3
+      OPTIONS { collections: @value3 }
       SORT TFIDF(doc) DESC`)
   })
 
@@ -79,9 +79,9 @@ describe('search.ts', () => {
     expect(builtSearch.bindVars.value2).to.deep.equal('text_en')
     expect(builtSearch.bindVars.value4).to.deep.equal(1)
     expect(builtSearch.bindVars.value5).to.deep.equal('a')
-    expect(builtSearch.bindVars.value6).to.deep.equal({
-      collections: [query.collections[0].name],
-    })
+    expect(builtSearch.bindVars.value6).to.deep.equal([
+      query.collections[0].name,
+    ])
     expect(builtSearch.query).to.equal(`
   SEARCH 
     (PHRASE(doc.@value0, @value1, @value2)) OR ((PHRASE(doc.@value0, @value1, @value2)) AND MIN_MATCH(
@@ -98,7 +98,7 @@ describe('search.ts', () => {
         NONE IN doc.@value0, @value2), 
     @value4)
     
-    OPTIONS @value6
+      OPTIONS { collections: @value6 }
       SORT TFIDF(doc) DESC`)
   })
 
@@ -136,7 +136,7 @@ describe('search.ts', () => {
         NONE IN doc.@value2, @value1), 
     @value3)
     
-    OPTIONS @value6
+      OPTIONS { collections: @value6 }
       SORT TFIDF(doc) DESC`)
   })
 
@@ -162,7 +162,7 @@ describe('search.ts', () => {
      NOT  (PHRASE(doc.@value0, @value1, @value2))
      
     
-    OPTIONS @value3
+      OPTIONS { collections: @value3 }
       SORT TFIDF(doc) DESC`)
   })
 
@@ -196,7 +196,7 @@ describe('search.ts', () => {
         NONE IN doc.@value2, @value1), 
     @value3)
     
-    OPTIONS @value4
+      OPTIONS { collections: @value4 }
       SORT TFIDF(doc) DESC`)
   })
 })

@@ -19,7 +19,7 @@ describe('multi-key search.ts', () => {
     expect(builtSearch).to.be.an('object')
     expect(Object.keys(builtSearch.bindVars)).to.have.length(2)
     expect(builtSearch.bindVars.value0).to.equal(true)
-    expect(builtSearch.bindVars.value1).to.deep.equal({ collections: ['coll'] })
+    expect(builtSearch.bindVars.value1).to.deep.equal(['coll'])
 
     /* empty array */
     let empty_array_query = {
@@ -47,14 +47,14 @@ describe('multi-key search.ts', () => {
     expect(builtSearch.bindVars.value0).to.equal('text_en')
     expect(builtSearch.bindVars.value1).to.equal('complex phrase')
     expect(builtSearch.bindVars.value2).to.equal('text_es')
-    expect(builtSearch.bindVars.value3).to.be.a('object')
+    expect(builtSearch.bindVars.value3).to.be.a('array')
     expect(builtSearch.query).to.equal(`
   SEARCH 
      
     (PHRASE(doc.@value0, @value1, @value0) OR PHRASE(doc.@value2, @value1, @value2))
     
     
-    OPTIONS @value3
+      OPTIONS { collections: @value3 }
       SORT TFIDF(doc) DESC`)
   })
 
@@ -78,9 +78,9 @@ describe('multi-key search.ts', () => {
     expect(builtSearch.bindVars.value4).to.equal(1)
     expect(builtSearch.bindVars.value5).to.equal('a')
     expect(builtSearch.bindVars.value6).to.equal(2)
-    expect(builtSearch.bindVars.value7).to.deep.equal({
-      collections: query.collections.map((c) => c.name),
-    })
+    expect(builtSearch.bindVars.value7).to.deep.equal(
+      query.collections.map((c) => c.name),
+    )
     expect(builtSearch.query).to.equal(`
   SEARCH 
     (PHRASE(doc.@value0, @value1, @value0) OR PHRASE(doc.@value2, @value1, @value2)) OR ((PHRASE(doc.@value0, @value1, @value0) OR PHRASE(doc.@value2, @value1, @value2)) AND MIN_MATCH(
@@ -103,7 +103,7 @@ describe('multi-key search.ts', () => {
         NONE IN doc.@value2, @value2), 
     @value6)
     
-    OPTIONS @value7
+      OPTIONS { collections: @value7 }
       SORT TFIDF(doc) DESC`)
   })
 
@@ -146,7 +146,7 @@ describe('multi-key search.ts', () => {
         NONE IN doc.@value2, @value2), 
     @value6)
     
-    OPTIONS @value7
+      OPTIONS { collections: @value7 }
       SORT TFIDF(doc) DESC`)
   })
 
@@ -169,7 +169,7 @@ describe('multi-key search.ts', () => {
      NOT  (PHRASE(doc.@value0, @value1, @value0) OR PHRASE(doc.@value2, @value1, @value2))
      
     
-    OPTIONS @value3
+      OPTIONS { collections: @value3 }
       SORT TFIDF(doc) DESC`)
   })
 
@@ -188,9 +188,7 @@ describe('multi-key search.ts', () => {
     expect(builtSearch.bindVars.value1).to.equal('text_en')
     expect(builtSearch.bindVars.value2).to.equal('text_es')
     expect(builtSearch.bindVars.value3).to.equal(2)
-    expect(builtSearch.bindVars.value4).to.deep.equal({
-      collections: ['coll', 'coll'],
-    })
+    expect(builtSearch.bindVars.value4).to.deep.equal(['coll', 'coll'])
     expect(builtSearch.query).to.equal(`
   SEARCH 
      
@@ -206,7 +204,7 @@ describe('multi-key search.ts', () => {
         NONE IN doc.@value2, @value2), 
     @value3)
     
-    OPTIONS @value4
+      OPTIONS { collections: @value4 }
       SORT TFIDF(doc) DESC`)
   })
 })
