@@ -38,7 +38,7 @@ interface](./img/searchbar_demo.png)](https://hp4k1h5.github.io/#search-box)
 
 ## Compatabilities
 
-This package is test against the following versions: 
+This package is tested against the following versions: 
 - arangojs: 7.6.1
 - arangodb: 3.8.4  
 
@@ -123,8 +123,8 @@ import {buildAQL, parseQuery} from '@hp4k1h5/AQLqueryBuilder.js'
 const {buildAQL} = require('@hp4k1h5/AQLqueryBuilder.js')
 ```
   This has been tested for
-  - ✅ node v14.4.0
-  - ✅ typescript v3.9.5
+  - ✅ node v17.3.0
+  - ✅ typescript v4.5.4
 
 ## usage
 __for up-to-date documentation, run `yarn doc && serve docs/` from the project
