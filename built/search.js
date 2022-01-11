@@ -6,6 +6,7 @@ var __makeTemplateObject = (this && this.__makeTemplateObject) || function (cook
 exports.__esModule = true;
 exports.buildSearch = void 0;
 var arangojs_1 = require("arangojs");
+var structs_1 = require("./lib/structs");
 var parse_1 = require("./parse");
 function buildSearch(query) {
     /* parse string query */
@@ -35,7 +36,7 @@ function buildOps(collections, terms, op) {
     if (!queryTerms.length)
         return;
     /* phrases */
-    var phrases = queryTerms.filter(function (qT) { return qT.type == 'phr'; });
+    var phrases = queryTerms.filter(function (qT) { return qT.type == structs_1.Type.phrase; });
     phrases = buildPhrases(phrases, collections, opWord);
     /* tokens */
     var tokens = queryTerms.filter(function (qT) { return qT.type === 'tok'; });

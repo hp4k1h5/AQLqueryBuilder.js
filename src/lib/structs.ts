@@ -120,7 +120,7 @@ export class Char {
     return /\s/.test(this.char)
   }
   isOperator() {
-    return /[+-?]/.test(this.char)
+    return /[-+?]/.test(this.char)
   }
   isQuote() {
     return /"|'/.test(this.char)

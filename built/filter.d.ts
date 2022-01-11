@@ -1,2 +1,2 @@
-import { filter } from './lib/structs';
-export declare function buildFilters(filters: filter[]): import("arangojs/aql").GeneratedAqlQuery;
+import { Filter } from './lib/structs';
+export declare function buildFilters(filters: Filter[]): import("arangojs/aql").GeneratedAqlQuery;
