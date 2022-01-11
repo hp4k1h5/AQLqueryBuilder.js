@@ -15,7 +15,7 @@ export interface query {
   /**
    * either an array of @param term interfaces or a string to be parsed by `parseQuery()`
    * */
-  terms: term[] | string
+  terms: Term[] | string
   /**
    * the name(s) of the document key to search. @default "text"
    * */
@@ -23,7 +23,7 @@ export interface query {
   /**
    * a list of @filter interfaces. All filters are implicitly AND'ed together.
    * */
-  filters?: filter[]
+  filters?: Filter[]
 }
 
 /**
@@ -67,12 +67,12 @@ export interface collection {
  *             | LEVENS | TODO | TODO| TODO  |
  * ```
  * */
-export interface term {
+export interface Term {
   /**
    * must be one of [ 'phr', 'tok' ], corresponding to `PHRASE` and
    * `TOKENS` respectively.
    **/
-  type: string
+  type: Type
   /**
    * the search string
    * */
@@ -81,13 +81,27 @@ export interface term {
    * must be one of [ '+', '?', '-' ] corresponding to `ANDS`, `ORS`, and
    * `NOTS`, respectively.
    * */
-  op: string
+  op: Operator
+}
+
+export enum Type {
+  phrase = 'phrase',
+  token = 'token',
+}
+
+export enum Operator {
+  AND = '+',
+  '+' = AND,
+  OR = '?',
+  '?' = OR,
+  NOT = '-',
+  '-' = NOT,
 }
 
 /**
  * passed to AQL `FILTER`
  * */
-export interface filter {
+export interface Filter {
   /** the arango document field name to filter on */
   field: string
   /** the high-level operator to filter by */
