@@ -211,8 +211,7 @@ describe('boolean search logic', () => {
       expect(result[0].title).to.equal('doc B')
     })
 
-    it(`should bring back only results matching AND'ed values
-       when +'ed TOKEN's are passed`, async () => {
+    it(`should bring back only results matching AND'ed values when +'ed TOKEN's are passed`, async () => {
       const info = await view.get()
       expect(info.name).to.be.a('string')
       let query = {

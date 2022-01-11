@@ -85,8 +85,8 @@ export interface Term {
 }
 
 export enum Type {
-  phrase = 'phrase',
-  token = 'token',
+  phrase = 'phr',
+  token = 'tok',
 }
 
 export enum Operator {
@@ -108,4 +108,21 @@ export interface Filter {
   op: string
   /** the query string to filter with */
   val: string | number | Date
+}
+
+export class Char {
+  char: string
+  constructor(ch: string) {
+    this.char = ch
+  }
+
+  isSpace() {
+    return /\s/.test(this.char)
+  }
+  isOperator() {
+    return /[+-?]/.test(this.char)
+  }
+  isQuote() {
+    return /"|'/.test(this.char)
+  }
 }

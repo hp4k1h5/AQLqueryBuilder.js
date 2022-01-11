@@ -1,5 +1,5 @@
 import { aql } from 'arangojs'
-import { query, collection, term } from './lib/structs'
+import { query, collection, Term, Type } from './lib/structs'
 import { parseQuery } from './parse'
 
 export function buildSearch(query: query): any {
@@ -36,14 +36,14 @@ export function buildSearch(query: query): any {
       OPTIONS { collections: ${cols} }
       SORT TFIDF(doc) DESC`
 }
-function buildOps(collections: collection[], terms: term[], op: string): any {
+function buildOps(collections: collection[], terms: Term[], op: string): any {
   const opWord: string = op == '+' ? ' AND ' : ' OR '
 
-  let queryTerms: any = terms.filter((t: term) => t.op == op)
+  let queryTerms: any = terms.filter((t: Term) => t.op == op)
   if (!queryTerms.length) return
 
   /* phrases */
-  let phrases = queryTerms.filter((qT: term) => qT.type == 'phr')
+  let phrases = queryTerms.filter((qT: Term) => qT.type == Type.phrase)
   phrases = buildPhrases(phrases, collections, opWord)
 
   /* tokens */
@@ -57,7 +57,7 @@ function buildOps(collections: collection[], terms: term[], op: string): any {
 }
 
 function buildPhrases(
-  phrases: term[],
+  phrases: Term[],
   collections: collection[],
   opWord: string,
 ): any {
@@ -69,7 +69,7 @@ function buildPhrases(
   )
 }
 
-function buildPhrase(phrase: term, collections: collection[]): any {
+function buildPhrase(phrase: Term, collections: collection[]): any {
   const phrases = []
   collections.forEach((coll) =>
     coll.keys.forEach((k: string) =>
@@ -81,7 +81,7 @@ function buildPhrase(phrase: term, collections: collection[]): any {
   return aql`(${aql.join(phrases, ' OR ')})`
 }
 
-function buildTokens(tokens: term[], collections: collection[]): any {
+function buildTokens(tokens: Term[], collections: collection[]): any {
   if (!tokens.length) return
 
   const opWordMap = {
@@ -97,7 +97,7 @@ function buildTokens(tokens: term[], collections: collection[]): any {
   }, {})
 
   const makeTokenAnalyzers = (
-    tokens: term[],
+    tokens: Term[],
     op: string,
     analyzer: string,
     keys: string[],

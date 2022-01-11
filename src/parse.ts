@@ -1,4 +1,4 @@
-import { Term, Type, Operator } from './lib/structs'
+import { Term, Type, Operator, Char } from './lib/structs'
 
 export function parseQuery(queryString: string): Term[] {
   const queryRgx: RegExp = /[+?-]?(["'(]).+?(\1|\))|[^"'()\s]+/g
@@ -34,25 +34,8 @@ export function parseQueryEXP(queryString: string): Term[] {
   return lex(queryString)
 }
 
-class Char {
-  char: string
-  constructor(ch: string) {
-    this.char = ch
-  }
-
-  isSpace() {
-    return /\s/.test(this.char)
-  }
-  isOperator() {
-    return /[+-?]/.test(this.char)
-  }
-  isQuote() {
-    return /"|'/.test(this.char)
-  }
-}
-
 function lex(queryString: string) {
-  const tokens = []
+  const lexes = []
   let curToken = ''
   let curTokenType: Type = Type.token
   let curOperator: Operator = Operator.OR
@@ -96,7 +79,7 @@ function lex(queryString: string) {
   }
 
   function resetCur() {
-    tokens.push({
+    lexes.push({
       type: curTokenType,
       val: curToken,
       op: curOperator,
@@ -107,7 +90,7 @@ function lex(queryString: string) {
     isToken = false
   }
 
-  return tokens
+  return lexes
 }
 
 export class ParseError extends Error {
@@ -124,10 +107,4 @@ export class ParseError extends Error {
   }
   // U+201C “
   // U+201D ”
-}
-
-try {
-  console.log(parseQueryEXP('"+hello    -there"    -apple'))
-} catch (e) {
-  console.error(e)
 }
