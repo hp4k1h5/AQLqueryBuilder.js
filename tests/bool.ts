@@ -68,6 +68,16 @@ describe('boolean search logic', () => {
     doc = await insert.batches.next()
     expect(doc[0].title).to.equal('doc B')
 
+    const docC = {
+      title: 'doc C',
+      text_en:
+        'random configuration letters and numbers 1323 string non-matching assortments',
+    }
+
+    insert = await db.query(aql`INSERT ${docC} INTO ${collection} RETURN NEW`)
+    doc = await insert.batches.next()
+    expect(doc[0].title).to.equal('doc C')
+
     const wait = (t: number) => new Promise((keep) => setTimeout(keep, t))
     await wait(1600)
 
@@ -112,7 +122,7 @@ describe('boolean search logic', () => {
       let cursor = await db.query(aqlQuery)
 
       let result = await cursor.batches.all()
-      expect(result[0]).to.have.length(2)
+      expect(result[0]).to.have.length(3)
 
       // pass multiple keys
       query.key = ['text_en', 'text_es']
@@ -120,7 +130,7 @@ describe('boolean search logic', () => {
       cursor = await db.query(aqlQuery)
 
       result = await cursor.batches.all()
-      expect(result[0]).to.have.length(2)
+      expect(result[0]).to.have.length(3)
     })
   })
 
@@ -278,7 +288,7 @@ describe('boolean search logic', () => {
       expect(result[0].title).to.equal('doc B')
 
       /* should bring back 0 document */
-      query.terms = 'random nonexistent stuff'
+      query.terms = 'nonexistent stuff'
       aqlQuery = buildAQL(query)
       cursor = await db.query(aqlQuery)
 
@@ -393,7 +403,7 @@ describe('boolean search logic', () => {
       cursor = await db.query(aqlQuery)
 
       result = await cursor.all()
-      expect(result).to.have.length(1)
+      expect(result).to.have.length(2)
       expect(result[0].title).to.equal('doc A')
 
       /* should bring back 0 results */
@@ -426,7 +436,7 @@ describe('boolean search logic', () => {
       let cursor = await db.query(aqlQuery)
 
       let result = await cursor.all()
-      expect(result).to.have.length(1)
+      expect(result).to.have.length(2)
       /* should exclude doc B */
       expect(result[0].title).to.equal('doc A')
 
@@ -449,6 +459,34 @@ describe('boolean search logic', () => {
       expect(result).to.have.length(1)
       /* should exclude doc A */
       expect(result[0].title).to.equal('doc B')
+    })
+  })
+
+  describe('boost', () => {
+    it.only('boosts results that include optional terms', async () => {
+      const query = {
+        view: view.name,
+        collections: [
+          {
+            name: collectionName,
+            analyzer: 'text_en',
+          },
+          {
+            name: collectionName,
+            analyzer: 'text_es',
+          },
+        ],
+        terms: '  +string  configuration Alice assortments',
+        key: ['text_en', 'text_es'],
+      }
+
+      let aqlQuery = buildAQL(query)
+      let cursor = await db.query(aqlQuery)
+
+      let result = await cursor.all()
+      expect(result).to.have.length(2)
+      // "string" is in documents B and C, while "configuration" and "assortments" are only in C
+      expect(result[0].title).to.equal('doc C')
     })
   })
 })
