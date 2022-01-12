@@ -1,8 +1,8 @@
 # AQLqueryBuilder.js
 > a typescript query builder for [arangodb](https://www.arangodb.com)'s [ArangoSearch](https://www.arangodb.com/docs/stable/arangosearch.html)
 
-[![search bar demonstration with schematic query
-interface](./img/searchbar_demo.png)](https://hp4k1h5.github.io/#search-box)
+[![search bar demonstration with schematic query interface](./img/searchbar_demo.png)](https://hp4k1h5.github.io/#search-box) 
+
 > See working demo at [hp4k1h5.github.io](https://hp4k1h5.github.io/#search-box).
 
 <!-- vim-markdown-toc GFM -->
@@ -13,6 +13,7 @@ interface](./img/searchbar_demo.png)](https://hp4k1h5.github.io/#search-box)
 * [setup](#setup)
 * [installation](#installation)
 * [usage](#usage)
+* [Exported Functions](#exported-functions)
   * [`buildAQL()`](#buildaql)
     * [query](#query)
     * [limit](#limit)
@@ -87,18 +88,9 @@ SEARCH
   RETURN doc`
 ```
 
-This query will retrieve all documents that __include__ the term "mandatory"
-AND __do not include__ the term "exclude", AND whose ranking will be boosted
-by the presence of the phrase "optional phrase". If no mandatory or exclude
-terms are provided, optional terms are considered required, so as not to
-retrieve all documents.
+See [default query syntax](#default-query-syntax) and this schematic [example](#example) for more details.
 
-See [default query syntax](#default-query-syntax) and this schematic
-[example](#example) for more details.
-
-If multiple collections are passed, the above query is replicated across all
-passed collections, see examples in 'tests/cols.ts'. In the future this will
-also accommodate multiple key searches.
+If multiple collections are passed, the query is replicated across all passed collections, see examples in 'tests/cols.ts'. In the future this will also accommodate multiple key searches.
 
 ___
 ## setup
@@ -106,7 +98,6 @@ ___
 1) running generated AQL queries will require a running ArangoDB v3.8+ instance. This package is tested against arangodb v3.8.4 🥑
 
 ## installation
-currently there is only support for server-side use.
 
 1) run `yarn add @hp4k1h5/AQLqueryBuilder.js`  
     or `npm install --save @hp4k1h5/AQLqueryBuilder.js`  
@@ -116,34 +107,27 @@ currently there is only support for server-side use.
   inside the directory.
 
 2) import/require the exported functions
+
 ```js
 // use either
 import {buildAQL, parseQuery} from '@hp4k1h5/AQLqueryBuilder.js'
 // or
 const {buildAQL} = require('@hp4k1h5/AQLqueryBuilder.js')
 ```
-  This has been tested for
-  - ✅ node v17.3.0
-  - ✅ typescript v4.5.4
+
+This has been tested for
+- ✅ node v17.3.0
+- ✅ typescript v4.5.4
 
 ## usage
-__for up-to-date documentation, run `yarn doc && serve docs/` from the project
-  directory root.__
 
-AQLqueryBuilder aims to provide cross-collection and cross-language, multi-key
-boolean search capabilities to the library's user.
+__for up-to-date documentation, run `yarn doc && serve docs/` from the project directory root.__
 
-Please ensure that the data you are trying to query against is indexed by an
-ArangoSearch View. The query will target all combinations of provided
-collections, analyzers and keys an simultaneously. This allows for granular
-multi-language search. This library is primarily built for academic and
-textual searches, and is ideally suited for documents like books, articles,
-and other text-heavy media.
+AQLqueryBuilder aims to provide cross-collection and cross-language, multi-key boolean search capabilities to the library's user.
 
-AQLqueryBuilder works best as a document query tool. Leveraging ArangoSearch's
-built-in language stemming analyzers allows for complex search phrases to be
-run against any number of language-specific collections simultaneously.
+Please ensure that the data you are trying to query against is indexed by an ArangoSearch View. The query will target all combinations of provided collections, analyzers and keys an simultaneously. This allows for granular multi-language search. This library is primarily built for academic and textual searches, and is ideally suited for documents like books, articles, and other text-heavy media.
 
+AQLqueryBuilder works best as a document query tool. Leveraging ArangoSearch's built-in language stemming analyzers allows for complex search phrases to be run against any number of language-specific collections simultaneously.
 
 __Example:__
 ```javascript
@@ -167,16 +151,20 @@ const aqlQuery = buildAQL(queryObject, limit)
 // ... const cursor = await db.query(buildAQL(queryObject, {start:20, count:20})
 ```
 
-Generate documenation with `yarn doc && serve docs/` or see more examples in
-e.g. [tests/search.ts](tests/search.ts)
+Generate documentation with `yarn doc && serve docs/` or see more examples in [tests/search.ts](tests/search.ts)
 
 ___
+
+## Exported Functions
 
 ### `buildAQL()`
 
 `buildAQL` accepts two parameters: `query` and `limit`
 
 #### query
+
+`query` is an object with the following keys:
+
 • **view**: *string* (required): the name of the ArangoSearch view the query
 will be run against
 
@@ -189,12 +177,8 @@ to query. Objects have the following shape:
   "keys": ["text", "summary", "notes"]
 }
 ```
-`keys` are optional, though if key names are provided to `query.key`, and
-not all those keys are indexed by the collection, it is advisable to
-explicitly list only those keys on documents in that collection that are
-indexed by the analyzer. If a collection is indexed by multiple analyzers
-please list each collection-analyzer combination along with their relevant
-keys, unless a unified set of keys is provided to `query.key`.
+
+`keys` are optional, though if key names are provided to `query.key`, and not all those keys are indexed by the collection, it is advisable to explicitly list only those keys on documents in that collection that are indexed by the analyzer. If a collection is indexed by multiple analyzers please list each collection-analyzer combination along with their relevant keys, unless a unified set of keys is provided to `query.key`.
 
 • **terms** (required): either an array of `term` interfaces or a query string
 to be parsed by `parseQuery()`.
@@ -207,14 +191,10 @@ to be parsed by `parseQuery()`.
   - **type** *string* (required): **one of `"phr"`** for PHRASES **or `"tok"`**
   for TOKENS.  
 
-• **key** (optional | default: "text"): the name of the Arango document key to
-search within.
+• **key** (optional | default: "text"): the name of the Arango document key to search within.
 
-• **filters** (optional): a list of filter interfaces. See [arango FILTER
-operations](https://www.arangodb.com/docs/stable/aql/operations-filter.html)
-for more details. All [Arango
-operators](https://www.arangodb.com/docs/3.6/aql/operators.html ) Filters have
-the following shape:
+• **filters** (optional): a list of filter interfaces. See [arango FILTER operations](https://www.arangodb.com/docs/stable/aql/operations-filter.html) for more details. All [Arango operators](https://www.arangodb.com/docs/3.6/aql/operators.html ) Filters have the following shape:
+
 ```json
 {
   "field": "the name of the field, i.e. Arango document key to filter on",
@@ -224,9 +204,11 @@ the following shape:
 ```
 
 #### limit
+
 an object with the following keys:
+
 - `start` (integer) 0-based result pagination lower bound.
-- `count` (integer) total number of results to return. ⚠ see CHANGELOG v0.1.1  
+- `count` (integer) total number of results to return.
 
 to bring back up to the first 10 results
 ```json
@@ -238,6 +220,7 @@ and the next page would be
 ```
 
 #### `query` example
+
 ```json
 {
   "view": "the_arango-search_view-name",
@@ -271,38 +254,30 @@ and the next page would be
 ```
 
 ___
+
 ### boolean search logic
-Quoting [mit's Database Search Tips](https://libguides.mit.edu/c.php?g=175963&p=1158594):
-> Boolean operators form the basis of mathematical sets and database logic.
-    They connect your search words together to either narrow or broaden your
-    set of results.  The three basic boolean operators are: AND, OR, and NOT.
+
+> Boolean operators form the basis of mathematical sets and database logic. They connect your search words together to either narrow or broaden your set of results.  The three basic boolean operators are: AND, OR, and NOT. 
+
+from [mit's Database Search Tips](https://libguides.mit.edu/c.php?g=175963&p=1158594)
 
 #### `+` AND
 
-* Mandatory terms and phrases. All results MUST INCLUDE these terms and
-  phrases.
+* Mandatory terms and phrases. All results MUST INCLUDE these terms and phrases.
 
 #### `?` OR
 
-* Optional terms and phrases. If there are ANDS or NOTS, these serve as match
-  score "boosters". If there are no ANDS or NOTS, ORS become required in
-  results.
+* Optional terms and phrases. If there are ANDS or NOTS, these serve as match score "boosters". If there are no ANDS or NOTS, ORS become required in results.
 
 #### `-` NOT
 
-* Search results MUST NOT INCLUDE these terms and phrases. If a result that
-  would otherwise have matched, contains one or more terms or phrases, it will
-  not be included in the result set. If there are no required or optional
-  terms, all results that do NOT match these terms will be returned.
+* Search results MUST NOT INCLUDE these terms and phrases. If a result that would otherwise have matched, contains one or more terms or phrases, it will not be included in the result set. If there are no required or optional terms, all results that do NOT match these terms will be returned.
 
 ### default query syntax
 
-for more information on boolean search logic see
-  [above](#boolean-search-logic)
+for more information on boolean search logic see [above](#boolean-search-logic)
 
-The default syntax accepted by `buildAQL()`'s query paramter key `terms` when
-passing in a string, instead of a `term` interface compatible array is as
-follows:
+The default syntax accepted by `buildAQL()`'s query paramter key `terms` when passing in a string, instead of a `term` interface compatible array is as follows:
 
 1) Everything inside single or double quotes is considered a `PHRASE`
 2) Everything else is considered a word to be analyzed by `TOKENS`
@@ -313,24 +288,18 @@ optional and is counted as an `OR`.
 
 Please see [tests/parse.ts](tests/parse.ts) for more examples.
 
-
 #### Example
 
-input `one +two -"buckle my shoe"` and `parseQuery()` will interpret that
-query string as follows:
+input `one +two -"buckle my shoe"` and `parseQuery()` will interpret that query string as follows:
 
 |        | ANDS | ORS | NOTS             |
 | -      | -    | -   | -                |
 | PHRASE |      |     | "buckle my shoe" |
 | TOKENS | two  | one |                  |
 
-The generated AQL query, when run, will bring back only results that contain
-"two", that do not contain the phrase "buckle my shoe", and that optionally
-contain "one". In this case, documents that contain "one" will be likely to
-score higher than those that do not.
+The generated AQL query, when run, will bring back only results that contain "two", that do not contain the phrase "buckle my shoe", and that optionally contain "one". In this case, documents that contain "one" will be likely to score higher than those that do not.
 
-When the above phrase `one +two -"buckle my shoe"` is run against the
-following documents:
+When the above phrase `one +two -"buckle my shoe"` is run against the following documents:
 
 ```boxcar
 ┏━━━━━━━━━━━━━━━━━━┓  ┏━━━━━━━━━━━━━━━━━━┓  ┏━━━━━━━━━━━━━━━━━━┓
