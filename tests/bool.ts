@@ -19,6 +19,7 @@ describe('boolean search logic', () => {
     try {
       await db.createDatabase(dbName)
     } catch (e) {
+      // console.error('could not create test db', e)
       console.error(e)
     }
 
@@ -436,7 +437,7 @@ describe('boolean search logic', () => {
       let cursor = await db.query(aqlQuery)
 
       let result = await cursor.all()
-      expect(result).to.have.length(2)
+      expect(result).to.have.length(1)
       /* should exclude doc B */
       expect(result[0].title).to.equal('doc A')
 
@@ -463,7 +464,7 @@ describe('boolean search logic', () => {
   })
 
   describe('boost', () => {
-    it.only('boosts results that include optional terms', async () => {
+    it('boosts results that include optional terms', async () => {
       const query = {
         view: view.name,
         collections: [
