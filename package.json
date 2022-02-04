@@ -1,7 +1,7 @@
 {
   "name": "@hp4k1h5/aqlquerybuilder.js",
   "license": "MIT",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "a typescript query builder for the Arango Query Language (AQL) via ArangoSearch",
   "scripts": {
     "build": "yarn tsc",
@@ -47,7 +47,7 @@
     "url": "https://github.com/HP4k1h5/AQLqueryBuilder.js/issues"
   },
   "files": [
-    "built/**/*.js"
+    "built/**/*.*"
   ],
   "directories": {
     "doc": "docs",
