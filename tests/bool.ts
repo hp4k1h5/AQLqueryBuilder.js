@@ -3,7 +3,7 @@ import { Database, aql } from 'arangojs'
 
 import { buildAQL } from '../src/index'
 
-const ARANGO_URL = process.env.TEST_ARANGODB_URL || 'http://localhost:8529'
+const ARANGO_URL = process.env.TEST_ARANGODB_URL || 'http://127.0.0.1:8529'
 
 describe('boolean search logic', () => {
   let db: Database

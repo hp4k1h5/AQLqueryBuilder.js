@@ -99,8 +99,8 @@ ___
 
 ## installation
 
-1) run `yarn add @hp4k1h5/AQLqueryBuilder.js`  
-    or `npm install --save @hp4k1h5/AQLqueryBuilder.js`  
+1) run `yarn add @hp4k1h5/aqlquerybuilder.js`  
+    or `npm install --save @hp4k1h5/aqlquerybuilder.js`  
     in a directory containing a `package.json` file.  
    __or__  
   clone this repository in your node compatible project. And run `yarn` from
@@ -110,9 +110,9 @@ ___
 
 ```js
 // use either
-import {buildAQL, parseQuery} from '@hp4k1h5/AQLqueryBuilder.js'
+import {buildAQL, parseQuery} from '@hp4k1h5/aqlquerybuilder.js'
 // or
-const {buildAQL} = require('@hp4k1h5/AQLqueryBuilder.js')
+const {buildAQL} = require('@hp4k1h5/aqlquerybuilder.js')
 ```
 
 This has been tested for
@@ -131,7 +131,7 @@ AQLqueryBuilder works best as a document query tool. Leveraging ArangoSearch's b
 
 __Example:__
 ```javascript
-import {buildAQL} from '@hp4k1h5/AQLqueryBuilder.js'
+import {buildAQL} from '@hp4k1h5/aqlquerybuilder.js'
 
 const queryObject = {
   "view": "the_arango-search_view-name",
