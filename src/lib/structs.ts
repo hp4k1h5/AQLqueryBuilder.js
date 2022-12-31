@@ -2,7 +2,7 @@
  * passed to buildAQL, i.e. `let generatedAQL = buildAQL(query)`. Properties
  * mimic or match those familiar to AQL.
  * */
-export interface query {
+export interface Query {
   /**
    * the name of the ArangoSearch View the query will be run against
    * */
@@ -11,7 +11,7 @@ export interface query {
    * the names and analyzers  of the collections indexed by @param
    * view to query
    * */
-  collections: collection[]
+  collections: Collection[]
   /**
    * either an array of @param term interfaces or a string to be parsed by `parseQuery()`
    * */
@@ -40,7 +40,7 @@ export interface query {
  * In either case all desired collection/analyzer combinations must be
  * specified.
  * */
-export interface collection {
+export interface Collection {
   /** the name of the collection */
   name: string
   /** the name of the text analyzer */

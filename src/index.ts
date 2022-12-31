@@ -1,5 +1,5 @@
-import { aql } from 'arangojs'
-import { query } from './lib/structs'
+import { aql, literal } from 'arangojs/aql'
+import { Query } from './lib/structs'
 import { buildSearch } from './search'
 import { buildFilters } from './filter'
 export { buildFilters } from './filter'
@@ -14,7 +14,7 @@ export { parseQuery } from './parse'
  * <https://www.arangodb.com/docs/stable/aql/operations-limit.html> @param
  * limit is an object with keys `start` @default 0, and `count` @default 20 */
 export function buildAQL(
-  query: query,
+  query: Query,
   limit: any = { start: 0, count: 20 },
 ): any {
   validateQuery(query)
@@ -25,21 +25,21 @@ export function buildAQL(
 
   /* FOR doc IN ${query.view} */
   return aql`
-    FOR doc IN ${aql.literal(query.view)}
+    FOR doc IN ${literal(query.view)}
       ${SEARCH}
       ${FILTER}
       LIMIT ${limit.start}, ${limit.count}
     RETURN doc`
 }
 
-function validateQuery(query: query) {
+function validateQuery(query: Query) {
   if (!query.view.length)
     throw new Error('query.view must be a valid ArangoSearch View name')
   if (!query.collections.length)
     throw new Error('query.collections must have at least one name')
 }
 
-function collectKeys(query: query) {
+function collectKeys(query: Query) {
   /* unify query.key */
   let _keys: string[]
   if (typeof query.key == 'string') {

@@ -1,8 +1,8 @@
-import { aql } from 'arangojs'
-import { query, collection, Term, Type } from './lib/structs'
+import { aql, literal, join } from 'arangojs/aql'
+import { Query, Collection, Term, Type } from './lib/structs'
 import { parseQuery } from './parse'
 
-export function buildSearch(query: query): any {
+export function buildSearch(query: Query): any {
   /* parse string query */
   query.terms =
     typeof query.terms == 'string' ? parseQuery(query.terms) : query.terms
@@ -18,9 +18,9 @@ export function buildSearch(query: query): any {
     ORS = undefined
   }
   if (!!NOTS) {
-    NOTS = aql`${ANDS || ORS ? aql.literal(' AND ') : undefined} 
-    ${NOTS.phrases ? aql.literal(' NOT ') : undefined} ${NOTS.phrases}
-    ${NOTS.phrases && NOTS.tokens ? aql.literal(' AND ') : undefined} ${
+    NOTS = aql`${ANDS || ORS ? literal(' AND ') : undefined} 
+    ${NOTS.phrases ? literal(' NOT ') : undefined} ${NOTS.phrases}
+    ${NOTS.phrases && NOTS.tokens ? literal(' AND ') : undefined} ${
       NOTS.tokens
     }`
   }
@@ -36,7 +36,7 @@ export function buildSearch(query: query): any {
       OPTIONS { collections: ${cols} }
       SORT TFIDF(doc) DESC`
 }
-function buildOps(collections: collection[], terms: Term[], op: string): any {
+function buildOps(collections: Collection[], terms: Term[], op: string): any {
   const opWord: string = op == '+' ? ' AND ' : ' OR '
 
   let queryTerms: any = terms.filter((t: Term) => t.op == op)
@@ -52,24 +52,24 @@ function buildOps(collections: collection[], terms: Term[], op: string): any {
 
   /* if (!phrases && !tokens) return */
   if (op == '-') return { phrases, tokens }
-  if (phrases && tokens) return aql.join([phrases, tokens], opWord)
+  if (phrases && tokens) return join([phrases, tokens], opWord)
   return tokens || phrases
 }
 
 function buildPhrases(
   phrases: Term[],
-  collections: collection[],
+  collections: Collection[],
   opWord: string,
 ): any {
   if (!phrases.length) return undefined
 
-  return aql.join(
+  return join(
     phrases.map((phrase: any) => buildPhrase(phrase, collections)),
     opWord,
   )
 }
 
-function buildPhrase(phrase: Term, collections: collection[]): any {
+function buildPhrase(phrase: Term, collections: Collection[]): any {
   const phrases = []
   collections.forEach((coll) =>
     coll.keys.forEach((k: string) =>
@@ -78,10 +78,10 @@ function buildPhrase(phrase: Term, collections: collection[]): any {
       ),
     ),
   )
-  return aql`(${aql.join(phrases, ' OR ')})`
+  return aql`(${join(phrases, ' OR ')})`
 }
 
-function buildTokens(tokens: Term[], collections: collection[]): any {
+function buildTokens(tokens: Term[], collections: Collection[]): any {
   if (!tokens.length) return
 
   const opWordMap = {
@@ -102,12 +102,12 @@ function buildTokens(tokens: Term[], collections: collection[]): any {
     analyzer: string,
     keys: string[],
   ) => {
-    return aql.join(
+    return join(
       keys.map(
         (k) => aql`
       ANALYZER(
         TOKENS(${tokens}, ${analyzer})
-        ${aql.literal(op)} IN doc.${k}, ${analyzer})`,
+        ${literal(op)} IN doc.${k}, ${analyzer})`,
       ),
       ' OR ',
     )
@@ -122,6 +122,6 @@ function buildTokens(tokens: Term[], collections: collection[]): any {
     )
   })
 
-  return aql`MIN_MATCH(${aql.join(remapped, ', ')}, 
+  return aql`MIN_MATCH(${join(remapped, ', ')}, 
     ${tokens[0].op === '-' ? collections.length : 1})`
 }

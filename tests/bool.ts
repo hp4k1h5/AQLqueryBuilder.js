@@ -1,14 +1,17 @@
 import { expect } from 'chai'
-import { Database, aql } from 'arangojs'
+import { Database } from 'arangojs/database'
+import { aql, literal } from 'arangojs/aql'
 
 import { buildAQL } from '../src/index'
+import { Query } from '../src/lib/structs'
+import { View } from 'arangojs/view'
 
 const ARANGO_URL = process.env.TEST_ARANGODB_URL || 'http://127.0.0.1:8529'
 
 describe('boolean search logic', () => {
   let db: Database
-  let collection
-  let view
+  let collection: string | number | boolean | Record<string, any> | null | undefined
+  let view: View
   let date = new Date().valueOf()
   const dbName = `testdb_${date}`
   const collectionName = `coll_${date}`
@@ -16,14 +19,10 @@ describe('boolean search logic', () => {
   before(async () => {
     /* create db */
     db = new Database({ url: ARANGO_URL, databaseName: '_system' })
-    try {
-      await db.createDatabase(dbName)
-    } catch (e) {
-      // console.error('could not create test db', e)
-      console.error(e)
-    }
 
-    db = new Database({ url: ARANGO_URL, databaseName: dbName })
+    await db.createDatabase(dbName)
+    db.database(dbName)
+
     /* create coll */
     collection = db.collection(collectionName)
     await collection.create()
@@ -37,7 +36,10 @@ describe('boolean search logic', () => {
         text_es: { analyzers: ['text_es'] },
       },
     }
-    await view.create({ links })
+    await view.create({
+      links,
+      type: 'arangosearch'
+    })
     let info = await view.get()
     expect(info.name).to.equal(view.name)
 
@@ -83,7 +85,7 @@ describe('boolean search logic', () => {
     await wait(1600)
 
     const getAllInViewQuery = aql`
-    FOR doc in ${aql.literal(info.name)}
+    FOR doc in ${literal(info.name)}
       RETURN doc`
     let allResults = await db.query(getAllInViewQuery)
     let all = await allResults.batches.all()
@@ -93,7 +95,7 @@ describe('boolean search logic', () => {
 
   after(async () => {
     try {
-      db.useDatabase('_system')
+      db = db.database('_system')
       await db.dropDatabase(dbName)
       /* should get deleted when dropping db */
       /* await view.drop() */
@@ -179,7 +181,7 @@ describe('boolean search logic', () => {
       await cursor.next()
 
       /* english */
-      query.key = ['text_en', 'text_es']
+      query.key = ['text_en', 'text_es'] as any
       query.terms = '+"in document"'
       aqlQuery = buildAQL(query)
       expect(aqlQuery.bindVars.value0).to.equal('text_en')
@@ -195,7 +197,7 @@ describe('boolean search logic', () => {
 
       /* should match 1 document */
       query.terms = '+"across  "  '
-      query.key = ['text_en', 'text_es']
+      query.key = ['text_en', 'text_es'] as any
       cursor = await db.query(buildAQL(query))
 
       result = await cursor.all()
@@ -211,7 +213,7 @@ describe('boolean search logic', () => {
       cursor = await db.query(buildAQL(query))
 
       /* multikey */
-      query.key = ['text', 'text_es']
+      query.key = ['text', 'text_es'] as any
       query.terms = '+"buscar"'
 
       let q = buildAQL(query)
@@ -371,7 +373,7 @@ describe('boolean search logic', () => {
   describe('NOTS', () => {
     it(`should bring back results *not* matching NOT'ed values
        when -'ed PHRASE's are passed`, async () => {
-      const query = {
+      const query: Query = {
         view: view.name,
         collections: [
           {
@@ -387,7 +389,7 @@ describe('boolean search logic', () => {
         ],
         /*  should bring back 1 result */
         terms: '  -"sample  " word  ',
-        key: ['text_en', , 'text_es'],
+        key: ['text_en', , 'text_es'] as any,
       }
 
       /* should bring back 1 results */
