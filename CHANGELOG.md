@@ -1,5 +1,9 @@
 # CHANGELOG
 
+- v0.1.9
+  - `query`, and `collection` types renamed `Query` and `Collection`
+  - bump deps
+
 - v0.1.3
   - updated dependencies
     - arangojs: ~~v6.14.1~~ → 7.6.1

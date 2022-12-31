@@ -31,17 +31,15 @@
 
 ## Patch Notes
 
-- aqlQueryBuilder.js v0.1.3
-  - updated compatabilities
-    - arangodb: ~~v3.6.5~~ → 3.8.4  
-  - updated dependencies
-    - arangojs: ~~v6.14.1~~ → 7.6.1
+- aqlQueryBuilder.js v0.1.9
+  - `query`, and `collection` types renamed `Query` and `Collection`
+  - bump deps
 
 ## Compatabilities
 
 This package is tested against the following versions: 
-- arangojs: 7.6.1
-- arangodb: 3.8.4  
+- arangojs: 8.1.0
+- arangodb: stable 3.10.0  
 
 ## overview
 
@@ -117,7 +115,7 @@ const {buildAQL} = require('@hp4k1h5/aqlquerybuilder.js')
 
 This has been tested for
 - ✅ node v17.3.0
-- ✅ typescript v4.5.4
+- ✅ typescript v4.9.4
 
 ## usage
 
